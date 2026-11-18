@@ -1,0 +1,6 @@
+{
+  "name": "Zentra",
+  "description": "Your Personal Knowledge Universe — online-first book discovery, immersive PDF reading, and local knowledge library.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1210 @@
+{
+  "version": 2,
+  "lastUpdated": "2026-11-18",
+  "categories": [
+    {
+      "id": "self-help-personal-development",
+      "name": "Self-Help & Personal Development",
+      "description": "Transformative works on mindset, belief, daily habits, and intentional personal growth."
+    },
+    {
+      "id": "philosophy-motivation",
+      "name": "Philosophy & Motivation",
+      "description": "Timeless statecraft, clear thinking, discipline, and mental principles for purposeful living."
+    },
+    {
+      "id": "psychology-mindset",
+      "name": "Psychology & Mindset",
+      "description": "Nonverbal intelligence, breath mastery, persuasion psychology, and human behavioral patterns."
+    },
+    {
+      "id": "productivity-business",
+      "name": "Productivity & Business",
+      "description": "Time mastery, stoic resilience, enduring wealth principles, and hard-won leadership."
+    }
+  ],
+  "authors": [
+    {
+      "id": "author_chanakya",
+      "name": "Chanakya",
+      "photoUrl": "",
+      "bio": "Ancient Indian polymath, royal advisor, economist, and philosopher (c. 375–283 BCE) who authored the Arthashastra and Chanakya Niti.",
+      "description": "Known also as Kautilya and Vishnugupta, Chanakya mentored Chandragupta Maurya in building the Mauryan Empire. His concise aphorisms remain enduring guides to ethics, leadership, and human nature.",
+      "expertise": [
+        "Statecraft",
+        "Practical Ethics",
+        "Leadership",
+        "Wisdom Literature"
+      ],
+      "bookIds": [
+        "book_chanakya_niti_hi"
+      ],
+      "relatedAuthorIds": [
+        "author_ryan_holiday",
+        "author_george_clason"
+      ]
+    },
+    {
+      "id": "author_julia_seton",
+      "name": "Dr. Julia Seton",
+      "photoUrl": "",
+      "bio": "Early 20th-century physician, lecturer, and New Thought author of Concentration and The Science of Success.",
+      "description": "Combined medical psychology with practical philosophy to teach focused attention, self-mastery, and purposeful action.",
+      "expertise": [
+        "Concentration",
+        "Personal Development",
+        "New Thought"
+      ],
+      "bookIds": [
+        "book_your_ultimate_guide_to_success_en"
+      ],
+      "relatedAuthorIds": [
+        "author_napoleon_hill",
+        "author_william_walker_atkinson"
+      ]
+    },
+    {
+      "id": "author_spencer_johnson",
+      "name": "Spencer Johnson",
+      "photoUrl": "",
+      "bio": "American physician and bestselling author renowned for concise parables on change, clarity, and decision-making.",
+      "description": "Co-authored The One Minute Manager and authored Who Moved My Cheese?, translated into dozens of languages worldwide.",
+      "expertise": [
+        "Change Management",
+        "Behavioral Clarity",
+        "Leadership Parables"
+      ],
+      "bookIds": [
+        "book_who_moved_my_cheese_en"
+      ],
+      "relatedAuthorIds": [
+        "author_marshall_goldsmith"
+      ]
+    },
+    {
+      "id": "author_shad_helmstetter",
+      "name": "Shad Helmstetter",
+      "photoUrl": "",
+      "bio": "Behavioral psychologist and pioneering researcher on self-talk, cognitive reprogramming, and habit architecture.",
+      "description": "Spent decades studying how internal dialogue shapes emotional resilience, self-confidence, and lifelong outcomes.",
+      "expertise": [
+        "Self-Talk Psychology",
+        "Cognitive Conditioning",
+        "Habits"
+      ],
+      "bookIds": [
+        "book_what_to_say_when_you_talk_to_yourself_en"
+      ],
+      "relatedAuthorIds": [
+        "author_joseph_murphy"
+      ]
+    },
+    {
+      "id": "author_joe_navarro",
+      "name": "Joe Navarro",
+      "photoUrl": "",
+      "bio": "Former FBI counterintelligence special agent and behavioral analyst with 25 years reading nonverbal communication.",
+      "description": "Co-founder of the FBI Behavioral Analysis Program and author of international bestsellers on body language and psychological observation.",
+      "expertise": [
+        "Body Language",
+        "Nonverbal Intelligence",
+        "Behavioral Observation"
+      ],
+      "bookIds": [
+        "book_what_every_body_is_saying_en"
+      ],
+      "relatedAuthorIds": [
+        "author_robert_greene"
+      ]
+    },
+    {
+      "id": "author_marshall_goldsmith",
+      "name": "Marshall Goldsmith",
+      "photoUrl": "",
+      "bio": "Executive leadership coach and Thinkers50 honoree specializing in lasting behavioral change.",
+      "description": "Advised global executives on overcoming blind spots, designing daily self-questioning habits, and building environmental accountability.",
+      "expertise": [
+        "Behavioral Change",
+        "Executive Coaching",
+        "Habit Design"
+      ],
+      "bookIds": [
+        "book_triggers_en"
+      ],
+      "relatedAuthorIds": [
+        "author_spencer_johnson",
+        "author_ben_horowitz"
+      ]
+    },
+    {
+      "id": "author_sudhir_dixit",
+      "name": "Dr. Sudhir Dixit",
+      "photoUrl": "",
+      "bio": "Indian author, educator, and acclaimed Hindi translator behind Time Management: Samay ke Sarvottam Upyog ke 30 Siddhant.",
+      "description": "Known across India for crystal-clear Hindi works on time mastery and productivity as well as Hindi editions of classic self-development books.",
+      "expertise": [
+        "Time Management",
+        "Productivity",
+        "Goal Setting"
+      ],
+      "bookIds": [
+        "book_time_management_hi"
+      ],
+      "relatedAuthorIds": [
+        "author_george_clason",
+        "author_darius_foroux"
+      ]
+    },
+    {
+      "id": "author_napoleon_hill",
+      "name": "Napoleon Hill",
+      "photoUrl": "",
+      "bio": "American self-help pioneer who interviewed hundreds of industrialists and builders over twenty years to codify Think and Grow Rich.",
+      "description": "Published Think and Grow Rich in 1937, introducing concepts such as definiteness of purpose, autosuggestion, and the Master Mind alliance.",
+      "expertise": [
+        "Success Philosophy",
+        "Definiteness of Purpose",
+        "Wealth Mindset"
+      ],
+      "bookIds": [
+        "book_think_and_grow_rich_en",
+        "book_think_and_grow_rich_hi"
+      ],
+      "relatedAuthorIds": [
+        "author_joseph_murphy",
+        "author_george_clason"
+      ]
+    },
+    {
+      "id": "author_darius_foroux",
+      "name": "Darius Foroux",
+      "photoUrl": "",
+      "bio": "Pragmatic philosopher, investor, and writer exploring stoicism, clear thinking, and purposeful productivity.",
+      "description": "Author of Think Straight and several essays read by millions on simplifying decisions and filtering mental noise.",
+      "expertise": [
+        "Clear Thinking",
+        "Stoicism",
+        "Decision Making"
+      ],
+      "bookIds": [
+        "book_think_straight_en"
+      ],
+      "relatedAuthorIds": [
+        "author_ryan_holiday"
+      ]
+    },
+    {
+      "id": "author_rhonda_byrne",
+      "name": "Rhonda Byrne",
+      "photoUrl": "",
+      "bio": "Australian writer and producer known worldwide for The Secret and The Magic.",
+      "description": "Her works center on intentional thought, daily gratitude rituals, and shifting attention toward constructive expectancy.",
+      "expertise": [
+        "Gratitude Practice",
+        "Positive Focus",
+        "Mindset"
+      ],
+      "bookIds": [
+        "book_the_secret_hi",
+        "book_the_magic_en"
+      ],
+      "relatedAuthorIds": [
+        "author_william_walker_atkinson",
+        "author_joseph_murphy"
+      ]
+    },
+    {
+      "id": "author_yogi_ramacharaka",
+      "name": "Yogi Ramacharaka",
+      "photoUrl": "",
+      "bio": "Classical yogic philosophy author of The Hindu-Yogi Science of Breath (1903) and Raja Yoga studies.",
+      "description": "Introduced Western and modern readers to pranayama, rhythmic breathing, vital energy (prana), and physiological calm.",
+      "expertise": [
+        "Breathwork",
+        "Pranayama",
+        "Mind-Body Regulation"
+      ],
+      "bookIds": [
+        "book_the_science_of_breath_en"
+      ],
+      "relatedAuthorIds": [
+        "author_william_walker_atkinson"
+      ]
+    },
+    {
+      "id": "author_george_clason",
+      "name": "George S. Clason",
+      "photoUrl": "",
+      "bio": "Soldier, businessman, and writer famous for The Richest Man in Babylon (1926).",
+      "description": "Set financial wisdom in timeless Babylonian parables that remain foundational lessons on saving, prudence, and compounding.",
+      "expertise": [
+        "Personal Finance",
+        "Capital Preservation",
+        "Parables"
+      ],
+      "bookIds": [
+        "book_the_richest_man_in_babylon_hi"
+      ],
+      "relatedAuthorIds": [
+        "author_napoleon_hill",
+        "author_mj_demarco"
+      ]
+    },
+    {
+      "id": "author_joseph_murphy",
+      "name": "Joseph Murphy",
+      "photoUrl": "",
+      "bio": "Author and lecturer who bridged comparative religion and psychology in The Power of Your Subconscious Mind (1963).",
+      "description": "Explored how habitual mental imagery, sleep-state reflection, and constructive belief shape confidence and behavior.",
+      "expertise": [
+        "Subconscious Mind",
+        "Mental Imagery",
+        "Habitual Belief"
+      ],
+      "bookIds": [
+        "book_the_power_of_your_subconscious_mind_en"
+      ],
+      "relatedAuthorIds": [
+        "author_shad_helmstetter",
+        "author_napoleon_hill"
+      ]
+    },
+    {
+      "id": "author_ryan_holiday",
+      "name": "Ryan Holiday",
+      "photoUrl": "",
+      "bio": "Modern Stoic author and media strategist known for The Obstacle is the Way, Ego Is the Enemy, and Stillness Is the Key.",
+      "description": "Draws on Marcus Aurelius, Epictetus, and Seneca to translate Stoic philosophy into practical frameworks for crisis and leadership.",
+      "expertise": [
+        "Applied Stoicism",
+        "Resilience",
+        "Strategic Focus"
+      ],
+      "bookIds": [
+        "book_the_obstacle_is_the_way_en"
+      ],
+      "relatedAuthorIds": [
+        "author_darius_foroux",
+        "author_ben_horowitz"
+      ]
+    },
+    {
+      "id": "author_mj_demarco",
+      "name": "MJ DeMarco",
+      "photoUrl": "",
+      "bio": "Entrepreneur, investor, and author of The Millionaire Fastlane challenging slow, passive wealth formulas.",
+      "description": "Advocates building asymmetric, scalable value-creating businesses grounded in customer utility rather than get-rich-quick myths.",
+      "expertise": [
+        "Entrepreneurship",
+        "Value Creation",
+        "Wealth Systems"
+      ],
+      "bookIds": [
+        "book_the_millionaire_fastlane_en"
+      ],
+      "relatedAuthorIds": [
+        "author_ben_horowitz",
+        "author_george_clason"
+      ]
+    },
+    {
+      "id": "author_william_walker_atkinson",
+      "name": "William Walker Atkinson",
+      "photoUrl": "",
+      "bio": "Attorney, publisher, and pioneering New Thought philosopher who wrote Thought Vibration: Or, the Law of Attraction in the Thought World (1906).",
+      "description": "One of the earliest writers to systematically explore mental focus, emotional resonance, and deliberate willpower.",
+      "expertise": [
+        "Mental Science",
+        "Willpower",
+        "Philosophy of Mind"
+      ],
+      "bookIds": [
+        "book_the_law_of_attraction_en"
+      ],
+      "relatedAuthorIds": [
+        "author_yogi_ramacharaka",
+        "author_rhonda_byrne"
+      ]
+    },
+    {
+      "id": "author_ben_horowitz",
+      "name": "Ben Horowitz",
+      "photoUrl": "",
+      "bio": "Co-founder of Andreessen Horowitz and former Opsware CEO, author of The Hard Thing About Hard Things (2014).",
+      "description": "Writes candidly about wartime leadership, layoffs, culture building, and surviving impossible operational moments.",
+      "expertise": [
+        "Startup Leadership",
+        "Executive Operations",
+        "Company Culture"
+      ],
+      "bookIds": [
+        "book_the_hard_thing_about_hard_things_en"
+      ],
+      "relatedAuthorIds": [
+        "author_mj_demarco",
+        "author_marshall_goldsmith"
+      ]
+    },
+    {
+      "id": "author_robert_greene",
+      "name": "Robert Greene",
+      "photoUrl": "",
+      "bio": "Author and historian of strategy, persuasion, and human psychology across The 48 Laws of Power and The Art of Seduction.",
+      "description": "Synthesizes classical history, literature, and psychology to illuminate social dynamics, charisma, and strategic restraint.",
+      "expertise": [
+        "Social Psychology",
+        "Persuasion",
+        "Historical Strategy"
+      ],
+      "bookIds": [
+        "book_the_art_of_seduction_en"
+      ],
+      "relatedAuthorIds": [
+        "author_joe_navarro",
+        "author_chanakya"
+      ]
+    }
+  ],
+  "books": [
+    {
+      "id": "book_chanakya_niti_hi",
+      "title": "Chanakya Niti",
+      "subtitle": "Practical statecraft, discernment, and daily conduct in Hindi",
+      "authorId": "author_chanakya",
+      "coverUrl": "",
+      "coverAccent": "#9A6B2F",
+      "pdfUrl": "",
+      "description": "Acharya Chanakya ke vyavaharik niti-sutra: vivek, samay ka mahatva, mitra-parakh, aur kartavya-palan par adharit Hindi granth.",
+      "summary": "Chanakya Niti brings together crisp ethical and strategic maxims on self-mastery, choosing trustworthy company, handling adversity with composure, and stewarding knowledge and wealth responsibly.",
+      "chapterSummaries": [
+        {
+          "chapterNumber": 1,
+          "title": "Vivek aur Sangati (Discernment & Company)",
+          "summary": "Explains why sound judgment, guarded speech, and wise companionship protect long-term peace and dignity."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Vidya aur Karmashilata (Learning & Effort)",
+          "summary": "Highlights knowledge as the truest wealth that cannot be stolen and grows when shared with discipline."
+        }
+      ],
+      "keyTakeaways": [
+        "Never reveal your strategic plans prematurely; execute quietly with steady focus.",
+        "Knowledge (Vidya) and good character travel with you in every country and circumstance.",
+        "Evaluate people by consistent conduct during difficulty rather than pleasant words."
+      ],
+      "practicalLessons": [
+        "Audit your daily circle and protect your mornings for study and reflection.",
+        "Think through consequences three steps ahead before making commitments."
+      ],
+      "importantQuotes": [
+        "Vidya hi manushya ka sabse bada dhan hai; ise koi chura nahi sakta.",
+        "Shuruat karne se pehle teen baar sochein, par nirnay ke baad piche na hatein."
+      ],
+      "category": "Philosophy & Motivation",
+      "subcategory": "Classical Indian Wisdom",
+      "language": "Hindi",
+      "tags": [
+        "Chanakya",
+        "Niti",
+        "Hindi",
+        "Strategy",
+        "Wisdom"
+      ],
+      "publishedYear": 300,
+      "pageCount": 10,
+      "difficulty": "Foundational",
+      "featured": true,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-10-15",
+      "relatedBookIds": [
+        "book_the_obstacle_is_the_way_en",
+        "book_think_straight_en"
+      ],
+      "sampleChapters": [
+        {
+          "title": "Adhyay 1: Vivek, Samay aur Sangati",
+          "paragraphs": [
+            "Acharya Chanakya kehte hain ki buddhiman vyakti apni yojanaon ko tab tak gupt rakhta hai jab tak karya purna na ho jaye. Vyavahar mein namrata aur vichar mein spashtata safalta ki neev hai.",
+            "Jo vyakti beete hue kal ka shok karta hai ya bhavishya ki chinta mein vartaman gawata hai, wah apni shakti khota hai. Samay aur avsar kisi ki pratiksha nahi karte."
+          ]
+        },
+        {
+          "title": "Adhyay 2: Vidya aur Charitra ka Mahatva",
+          "paragraphs": [
+            "Dhan aur pad samay ke sath badal sakte hain, kintu arjit gyan aur sanyam har paristhiti mein raksha karte hain. Roz thoda adhyayan aur atma-nirikshan manushya ko nirbhay banata hai."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "book_your_ultimate_guide_to_success_en",
+      "title": "Your Ultimate Guide to Success",
+      "subtitle": "Concentration, mental poise, and purposeful achievement",
+      "authorId": "author_julia_seton",
+      "coverUrl": "",
+      "coverAccent": "#1E3A8A",
+      "pdfUrl": "",
+      "description": "A practical manual uniting mental concentration, self-discipline, and structured habit execution for lasting success.",
+      "summary": "Dr. Julia Seton outlines how scattered energy holds capable people back and shows how cultivating undivided attention, calm confidence, and daily follow-through produces compounding results.",
+      "keyTakeaways": [
+        "Direct undivided attention toward one worthy aim at a time rather than dividing willpower.",
+        "Success follows consistent inward preparation paired with decisive outward execution.",
+        "Replace vague wishing with measurable daily standards of effort."
+      ],
+      "practicalLessons": [
+        "Write down your primary objective each morning and eliminate one non-essential task."
+      ],
+      "importantQuotes": [
+        "Concentration is the quiet bridge between an earnest intention and finished craft."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Mastery & Habits",
+      "language": "English",
+      "tags": [
+        "Success",
+        "Focus",
+        "Self-Help",
+        "Discipline"
+      ],
+      "publishedYear": 1916,
+      "pageCount": 9,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": false,
+      "newlyAdded": false,
+      "addedDate": "2026-09-10",
+      "relatedBookIds": [
+        "book_think_and_grow_rich_en",
+        "book_think_straight_en"
+      ]
+    },
+    {
+      "id": "book_who_moved_my_cheese_en",
+      "title": "Who Moved My Cheese?",
+      "subtitle": "An A-Mazing way to deal with change in your work and in your life",
+      "authorId": "author_spencer_johnson",
+      "coverUrl": "",
+      "coverAccent": "#B45309",
+      "pdfUrl": "",
+      "description": "A memorable parable about four characters in a maze who reveal how differently we respond when circumstances shift unexpectedly.",
+      "summary": "Through Sniff, Scurry, Hem, and Haw, Spencer Johnson illustrates why noticing subtle changes early, letting go of outdated expectations, and moving forward despite fear protects peace and opportunity.",
+      "keyTakeaways": [
+        "Change happens continually; anticipating it early beats resisting it after the fact.",
+        "The sooner you let go of old comfort zones, the sooner you discover new opportunities.",
+        "Movement in a new direction reduces fear faster than overanalyzing losses."
+      ],
+      "importantQuotes": [
+        "What would you do if you weren’t afraid?",
+        "Smell the cheese often so you know when it is getting old."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Adaptability",
+      "language": "English",
+      "tags": [
+        "Change",
+        "Parable",
+        "Mindset",
+        "Growth"
+      ],
+      "publishedYear": 1998,
+      "pageCount": 8,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-09-22",
+      "relatedBookIds": [
+        "book_triggers_en",
+        "book_the_obstacle_is_the_way_en"
+      ]
+    },
+    {
+      "id": "book_what_to_say_when_you_talk_to_yourself_en",
+      "title": "What to Say When You Talk to Yourself",
+      "subtitle": "Reprogramming internal dialogue for confidence and clear action",
+      "authorId": "author_shad_helmstetter",
+      "coverUrl": "",
+      "coverAccent": "#0F766E",
+      "pdfUrl": "",
+      "description": "Explains the five levels of self-talk and how intentional mental phrasing reshapes habits, emotional balance, and follow-through.",
+      "summary": "Shad Helmstetter demonstrates that the brain acts on the instructions we repeat most consistently—and provides structured language shifts to replace passive self-doubt with grounded accountability.",
+      "keyTakeaways": [
+        "Notice negative automatic phrasing and replace “I never” with specific present-tense action.",
+        "Consistency in calm, realistic self-talk outperforms brief bursts of hype."
+      ],
+      "importantQuotes": [
+        "You will become what you think about and quietly repeat to yourself most often."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Self-Talk & Habits",
+      "language": "English",
+      "tags": [
+        "Self-Talk",
+        "Psychology",
+        "Confidence",
+        "Habits"
+      ],
+      "publishedYear": 1986,
+      "pageCount": 9,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-10-01",
+      "relatedBookIds": [
+        "book_the_power_of_your_subconscious_mind_en",
+        "book_triggers_en"
+      ]
+    },
+    {
+      "id": "book_what_every_body_is_saying_en",
+      "title": "What Every BODY is Saying",
+      "subtitle": "An ex-FBI agent’s guide to speed-reading people",
+      "authorId": "author_joe_navarro",
+      "coverUrl": "",
+      "coverAccent": "#1E293B",
+      "pdfUrl": "",
+      "description": "A field guide to observing comfort, stress, pacifying gestures, and limbic-system cues in everyday conversations.",
+      "summary": "Drawing on decades of interviews, Joe Navarro explains how to establish behavioral baselines first, read feet, torso, and hands accurately, and avoid single-gesture misinterpretations.",
+      "keyTakeaways": [
+        "Always establish a baseline before interpreting any nonverbal signal as stress or discomfort.",
+        "Notice clusters of behaviors rather than relying on one isolated gesture.",
+        "Feet and posture often reflect genuine comfort or desire to leave more honestly than facial expressions."
+      ],
+      "importantQuotes": [
+        "Observation means noticing what is actually in front of you before assuming what it means."
+      ],
+      "category": "Psychology & Mindset",
+      "subcategory": "Nonverbal Communication",
+      "language": "English",
+      "tags": [
+        "Body Language",
+        "Psychology",
+        "Communication",
+        "Observation"
+      ],
+      "publishedYear": 2008,
+      "pageCount": 10,
+      "difficulty": "Intermediate",
+      "featured": true,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-10-08",
+      "relatedBookIds": [
+        "book_the_art_of_seduction_en",
+        "book_triggers_en"
+      ]
+    },
+    {
+      "id": "book_triggers_en",
+      "title": "Triggers",
+      "subtitle": "Creating behavior that lasts—becoming the person you want to be",
+      "authorId": "author_marshall_goldsmith",
+      "coverUrl": "",
+      "coverAccent": "#4338CA",
+      "pdfUrl": "",
+      "description": "Shows how environmental cues derail good intentions and how active daily questions sustain genuine behavioral change.",
+      "summary": "Marshall Goldsmith explores why adult behavior is so hard to change without structural check-ins, introducing the Daily Questions method: asking “Did I do my best to…” each evening.",
+      "keyTakeaways": [
+        "Environment silently triggers habits; redesign cues instead of blaming willpower alone.",
+        "Switch from passive reflection to active “Did I do my best to…” accountability.",
+        "Anticipate high-friction triggers at the end of exhausting workdays."
+      ],
+      "importantQuotes": [
+        "If we do not create and control our environment, our environment creates and controls us."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Behavioral Change",
+      "language": "English",
+      "tags": [
+        "Habits",
+        "Accountability",
+        "Leadership",
+        "Behavior"
+      ],
+      "publishedYear": 2015,
+      "pageCount": 10,
+      "difficulty": "Intermediate",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": true,
+      "addedDate": "2026-11-05",
+      "relatedBookIds": [
+        "book_who_moved_my_cheese_en",
+        "book_the_hard_thing_about_hard_things_en"
+      ]
+    },
+    {
+      "id": "book_time_management_hi",
+      "title": "Time Management",
+      "subtitle": "Samay ke sarvottam upyog ke 30 vyavaharik siddhant",
+      "authorId": "author_sudhir_dixit",
+      "coverUrl": "",
+      "coverAccent": "#0369A1",
+      "pdfUrl": "",
+      "description": "Din ke 24 ghanto ka sarvottam upyog karne, prathmikta tay karne, aur talmatol rokne ke liye Hindi margdarshika.",
+      "summary": "Dr. Sudhir Dixit presents thirty concise principles for guarding your prime morning hours, applying the 80/20 rule to high-leverage work, saying no politely, and building daily focus blocks.",
+      "keyTakeaways": [
+        "Spend your peak-energy morning hours on high-impact goals before reactive tasks.",
+        "Track where hours actually leak each week; awareness precedes discipline.",
+        "Apply the 80/20 principle to concentrate on the vital twenty percent of priorities."
+      ],
+      "importantQuotes": [
+        "Samay ka prabandhan vastav mein apne jeevan aur prathmiktaon ka prabandhan hai."
+      ],
+      "category": "Productivity & Business",
+      "subcategory": "Time Mastery",
+      "language": "Hindi",
+      "tags": [
+        "Time Management",
+        "Hindi",
+        "Productivity",
+        "Focus"
+      ],
+      "publishedYear": 2012,
+      "pageCount": 9,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-10-19",
+      "relatedBookIds": [
+        "book_think_straight_en",
+        "book_chanakya_niti_hi"
+      ]
+    },
+    {
+      "id": "book_think_and_grow_rich_en",
+      "title": "Think and Grow Rich",
+      "subtitle": "Thirteen enduring principles of purpose, persistence, and mastery",
+      "authorId": "author_napoleon_hill",
+      "coverUrl": "",
+      "coverAccent": "#1E3A8A",
+      "pdfUrl": "",
+      "description": "The 1937 classic distilling decades of interviews into actionable steps on definiteness of purpose, specialized knowledge, and persistence.",
+      "summary": "Napoleon Hill frames achievement as the compound product of clear definite purpose, organized planning, wise mentorship (the Master Mind), and refusal to quit at temporary defeat.",
+      "keyTakeaways": [
+        "Define an exact, concrete objective backed by a written plan and daily execution.",
+        "Surround yourself with honest, capable peers in a Master Mind alliance.",
+        "Treat temporary setbacks as feedback rather than proof of permanent defeat."
+      ],
+      "importantQuotes": [
+        "Whatever the mind can conceive and believe, it can achieve.",
+        "Strength and growth come only through continuous effort and struggle."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Success Philosophy",
+      "language": "English",
+      "tags": [
+        "Classic",
+        "Mindset",
+        "Persistence",
+        "Purpose"
+      ],
+      "publishedYear": 1937,
+      "pageCount": 10,
+      "difficulty": "Foundational",
+      "featured": true,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-09-01",
+      "relatedBookIds": [
+        "book_think_and_grow_rich_hi",
+        "book_the_millionaire_fastlane_en"
+      ],
+      "sampleChapters": [
+        {
+          "title": "Chapter 1: Desire & Definiteness of Purpose",
+          "paragraphs": [
+            "Vague wishes evaporate at the first obstacle. Clear achievement begins when an individual translates a general hope into a definite chief aim accompanied by a concrete timeline and service value.",
+            "Daily review of your written aim focuses attention on opportunities that scattered minds overlook."
+          ]
+        },
+        {
+          "title": "Chapter 2: Organized Planning & Persistence",
+          "paragraphs": [
+            "When a first plan fails, replace the plan—never abandon a sound objective prematurely. Persistence is the quiet discipline that converts study into measurable work."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "book_think_straight_en",
+      "title": "Think Straight",
+      "subtitle": "Change your thoughts, change your life",
+      "authorId": "author_darius_foroux",
+      "coverUrl": "",
+      "coverAccent": "#334155",
+      "pdfUrl": "",
+      "description": "A concise guide to quieting mental clutter, separating useful reflection from overthinking, and making calm decisions.",
+      "summary": "Darius Foroux distinguishes practical problem-solving thoughts from repetitive emotional noise, offering pragmatic tools like journaling, prioritization, and intentional pauses.",
+      "keyTakeaways": [
+        "Overthinking is thinking without a concrete decision or action attached.",
+        "Write thoughts on paper to test whether an argument actually holds up.",
+        "Reserve deep focus for things directly inside your sphere of control."
+      ],
+      "importantQuotes": [
+        "Your mind is a tool—use it deliberately instead of letting it run wild."
+      ],
+      "category": "Philosophy & Motivation",
+      "subcategory": "Clear Thinking",
+      "language": "English",
+      "tags": [
+        "Clarity",
+        "Overthinking",
+        "Philosophy",
+        "Decisions"
+      ],
+      "publishedYear": 2017,
+      "pageCount": 8,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": true,
+      "addedDate": "2026-11-08",
+      "relatedBookIds": [
+        "book_the_obstacle_is_the_way_en",
+        "book_chanakya_niti_hi"
+      ]
+    },
+    {
+      "id": "book_think_and_grow_rich_hi",
+      "title": "Think and Grow Rich",
+      "subtitle": "Socho aur Amir Bano — Hindi Edition",
+      "authorId": "author_napoleon_hill",
+      "coverUrl": "",
+      "coverAccent": "#1D4ED8",
+      "pdfUrl": "",
+      "description": "Napoleon Hill ki prasiddh pustak ka Hindi anuvad: nishchit lakshya, atma-vishwas, yojana aur dridh sankalp ke 13 siddhant.",
+      "summary": "Hindi edition of Napoleon Hill’s classic work guiding readers through definite purpose, specialized learning, decisive action, and persistent self-discipline.",
+      "keyTakeaways": [
+        "Apne lakshya ko likhkar aur spasht yojana banakar roz prayas karein.",
+        "Asafaltaon se nirash hone ke bajay apni yojana ko sudhar kar aage badhein."
+      ],
+      "importantQuotes": [
+        "Manushya ka dimag jo soch sakta hai aur jis par vishwas kar sakta hai, use hasil bhi kar sakta hai."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Success Philosophy",
+      "language": "Hindi",
+      "tags": [
+        "Hindi",
+        "Napoleon Hill",
+        "Mindset",
+        "Success"
+      ],
+      "publishedYear": 1937,
+      "pageCount": 10,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-09-02",
+      "relatedBookIds": [
+        "book_think_and_grow_rich_en",
+        "book_the_richest_man_in_babylon_hi"
+      ]
+    },
+    {
+      "id": "book_the_secret_hi",
+      "title": "The Secret",
+      "subtitle": "Rahasya — Hindi Edition",
+      "authorId": "author_rhonda_byrne",
+      "coverUrl": "",
+      "coverAccent": "#7C2D12",
+      "pdfUrl": "",
+      "description": "Rhonda Byrne ki pustak ka Hindi sanskaran: sakaratmak soch, kritagyata aur spast drishti ke niyam.",
+      "summary": "Explores how habitual focus, gratitude, and mental clarity influence the choices, energy, and opportunities a reader notices and acts upon.",
+      "keyTakeaways": [
+        "Kritagyata (gratitude) aur sakaratmak dhyan man ko sthir aur urjavan rakhte hain.",
+        "Apne dhyan ko kami ke bajay nirman aur samadhan par kendrit karein."
+      ],
+      "importantQuotes": [
+        "Kritagyata vartaman mein maujud achhai ko badhane ka sabse saral marg hai."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Mindset & Gratitude",
+      "language": "Hindi",
+      "tags": [
+        "Hindi",
+        "Gratitude",
+        "Mindset",
+        "Motivation"
+      ],
+      "publishedYear": 2006,
+      "pageCount": 9,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-09-18",
+      "relatedBookIds": [
+        "book_the_magic_en",
+        "book_the_law_of_attraction_en"
+      ]
+    },
+    {
+      "id": "book_the_science_of_breath_en",
+      "title": "The Science of Breath",
+      "subtitle": "Complete manual of physical, mental, and spiritual breathing philosophy",
+      "authorId": "author_yogi_ramacharaka",
+      "coverUrl": "",
+      "coverAccent": "#065F46",
+      "pdfUrl": "",
+      "description": "Classical treatise on nasal breathing, diaphragmatic mechanics, rhythmic pranayama, and calming the nervous system.",
+      "summary": "Published in 1903, Yogi Ramacharaka explains the anatomy of full yogic breathing and teaches simple rhythmic breath exercises for stamina, mental stillness, and focus before study.",
+      "keyTakeaways": [
+        "Deep, unhurried diaphragmatic breathing calms reactive stress and sharpens attention.",
+        "Rhythmic inhalation and exhalation synchronize breath with steady posture and clarity."
+      ],
+      "importantQuotes": [
+        "Breath is the quiet link between physical vitality and mental composure."
+      ],
+      "category": "Psychology & Mindset",
+      "subcategory": "Breathwork & Calm",
+      "language": "English",
+      "tags": [
+        "Breathwork",
+        "Pranayama",
+        "Mindfulness",
+        "Classic"
+      ],
+      "publishedYear": 1903,
+      "pageCount": 8,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": false,
+      "newlyAdded": false,
+      "addedDate": "2026-08-25",
+      "relatedBookIds": [
+        "book_chanakya_niti_hi",
+        "book_what_every_body_is_saying_en"
+      ]
+    },
+    {
+      "id": "book_the_richest_man_in_babylon_hi",
+      "title": "The Richest Man in Babylon",
+      "subtitle": "Babylon ka Sabse Amir Aadmi — Hindi Edition",
+      "authorId": "author_george_clason",
+      "coverUrl": "",
+      "coverAccent": "#334155",
+      "pdfUrl": "",
+      "description": "Prachin Babylon ki kahaniyon ke madhyam se bachat, nivesh, aur arthik anushasan sikhane wali Hindi pustak.",
+      "summary": "George S. Clason’s enduring financial parables in Hindi: pay yourself first (save at least 10%), guard principal from speculative risk, control expenses, and keep learning marketable skills.",
+      "keyTakeaways": [
+        "Apni aay ka kam se kam 10% hissa hamesha apne liye surakshit bachat mein rakhein.",
+        "Anubhavi salahkaron ke bina apni punji ko jokhim bhare soode mein na lagayein.",
+        "Kharchon par niyantran aur niyamit nivesh samay ke sath sampatti banate hain."
+      ],
+      "importantQuotes": [
+        "Aap jo kamate hain, uska ek hissa hamesha aapke paas rehne ke liye hai."
+      ],
+      "category": "Productivity & Business",
+      "subcategory": "Personal Finance",
+      "language": "Hindi",
+      "tags": [
+        "Hindi",
+        "Finance",
+        "Saving",
+        "Compounding"
+      ],
+      "publishedYear": 1926,
+      "pageCount": 9,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-09-29",
+      "relatedBookIds": [
+        "book_the_millionaire_fastlane_en",
+        "book_think_and_grow_rich_hi"
+      ]
+    },
+    {
+      "id": "book_the_power_of_your_subconscious_mind_en",
+      "title": "The Power of Your Subconscious Mind",
+      "subtitle": "How habitual thought patterns influence confidence and wellbeing",
+      "authorId": "author_joseph_murphy",
+      "coverUrl": "",
+      "coverAccent": "#4F46E5",
+      "pdfUrl": "",
+      "description": "Explores how calm visualization, constructive belief, and pre-sleep reflection retrain deeply ingrained mental habits.",
+      "summary": "Joseph Murphy shows the interplay between the reasoning conscious mind and the pattern-storing subconscious mind, emphasizing daily calm, forgiveness, and clarity over fearful self-talk.",
+      "keyTakeaways": [
+        "Your subconscious accepts and amplifies whatever mental state you rehearse consistently.",
+        "Quiet reflection just before sleep helps settle anxious rumination."
+      ],
+      "importantQuotes": [
+        "Change your thoughts, and you quietly alter the direction of your habits."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Subconscious Mindset",
+      "language": "English",
+      "tags": [
+        "Mindset",
+        "Subconscious",
+        "Habits",
+        "Clarity"
+      ],
+      "publishedYear": 1963,
+      "pageCount": 10,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-10-05",
+      "relatedBookIds": [
+        "book_what_to_say_when_you_talk_to_yourself_en",
+        "book_think_and_grow_rich_en"
+      ]
+    },
+    {
+      "id": "book_the_obstacle_is_the_way_en",
+      "title": "The Obstacle is the Way",
+      "subtitle": "The timeless art of turning trials into triumph",
+      "authorId": "author_ryan_holiday",
+      "coverUrl": "",
+      "coverAccent": "#0F172A",
+      "pdfUrl": "",
+      "description": "Applies Stoic philosophy across Perception, Action, and Will to confront adversity with poise and disciplined execution.",
+      "summary": "Inspired by Marcus Aurelius, Ryan Holiday divides difficulty into three arenas: seeing clearly without panic (Perception), moving methodically forward (Action), and cultivating inner resilience (Will).",
+      "keyTakeaways": [
+        "Separate objective facts from the anxious story your mind adds onto them.",
+        "Every impediment to action advances action; what stands in the way becomes the way.",
+        "Focus strictly on the next right step inside your control."
+      ],
+      "importantQuotes": [
+        "The obstacle in the path becomes the path. Never forget, within every obstacle is an opportunity to improve our condition."
+      ],
+      "category": "Productivity & Business",
+      "subcategory": "Applied Stoicism",
+      "language": "English",
+      "tags": [
+        "Stoicism",
+        "Resilience",
+        "Leadership",
+        "Philosophy"
+      ],
+      "publishedYear": 2014,
+      "pageCount": 10,
+      "difficulty": "Intermediate",
+      "featured": true,
+      "popular": true,
+      "newlyAdded": true,
+      "addedDate": "2026-11-11",
+      "relatedBookIds": [
+        "book_think_straight_en",
+        "book_the_hard_thing_about_hard_things_en"
+      ],
+      "sampleChapters": [
+        {
+          "title": "Part I: The Discipline of Perception",
+          "paragraphs": [
+            "How we look at an unexpected setback determines whether it paralyzes us or sharpens our focus. Panic magnifies obstacles; steady observation shrinks them back to solvable parts.",
+            "Before reacting, pause and ask: what here depends solely on my own response?"
+          ]
+        },
+        {
+          "title": "Part II: The Discipline of Action",
+          "paragraphs": [
+            "Boldness without structure fails quickly, while deliberate incremental movement dismantles large problems piece by piece."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "book_the_millionaire_fastlane_en",
+      "title": "The Millionaire Fastlane",
+      "subtitle": "Crack the code to wealth and live rich for a lifetime",
+      "authorId": "author_mj_demarco",
+      "coverUrl": "",
+      "coverAccent": "#111827",
+      "pdfUrl": "",
+      "description": "Challenges passive multi-decade waiting strategies by emphasizing asymmetric value creation, entrepreneurship, and customer impact.",
+      "summary": "MJ DeMarco contrasts the Sidewalk, Slowlane, and Fastlane financial mindsets, showing why scalable systems, ownership, and solving real market pain points create both wealth and time autonomy.",
+      "keyTakeaways": [
+        "Wealth scales with the number and depth of lives your product or service genuinely helps.",
+        "Shift from being solely a consumer to building durable, controllable producer assets.",
+        "Time—never money—is your rarest non-renewable asset."
+      ],
+      "importantQuotes": [
+        "Stop chasing money and start solving unmet needs at scale."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Entrepreneurship & Wealth",
+      "language": "English",
+      "tags": [
+        "Entrepreneurship",
+        "Wealth",
+        "Systems",
+        "Business"
+      ],
+      "publishedYear": 2010,
+      "pageCount": 10,
+      "difficulty": "Intermediate",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-10-20",
+      "relatedBookIds": [
+        "book_the_hard_thing_about_hard_things_en",
+        "book_the_richest_man_in_babylon_hi"
+      ]
+    },
+    {
+      "id": "book_the_law_of_attraction_en",
+      "title": "The Law of Attraction",
+      "subtitle": "Thought vibration and intentional mental resonance",
+      "authorId": "author_william_walker_atkinson",
+      "coverUrl": "",
+      "coverAccent": "#6D28D9",
+      "pdfUrl": "",
+      "description": "A foundational 1906 exploration of how sustained attention, emotional composure, and deliberate thought shape character and action.",
+      "summary": "William Walker Atkinson writes on cultivating steady willpower, rising above reactive fear, and aligning daily mental habits with constructive, generous purpose.",
+      "keyTakeaways": [
+        "Sustained thought habits quietly steer what you notice, attempt, and persist through.",
+        "Replace fearful preoccupation with calm, steady mental focus."
+      ],
+      "importantQuotes": [
+        "Calm, directed thought is among the most practical forces available to the human mind."
+      ],
+      "category": "Philosophy & Motivation",
+      "subcategory": "New Thought Classics",
+      "language": "English",
+      "tags": [
+        "Mindset",
+        "Focus",
+        "Philosophy",
+        "Classic"
+      ],
+      "publishedYear": 1906,
+      "pageCount": 8,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": false,
+      "newlyAdded": false,
+      "addedDate": "2026-08-30",
+      "relatedBookIds": [
+        "book_the_secret_hi",
+        "book_the_magic_en"
+      ]
+    },
+    {
+      "id": "book_the_hard_thing_about_hard_things_en",
+      "title": "The Hard Thing About Hard Things",
+      "subtitle": "Building a business when there are no easy answers",
+      "authorId": "author_ben_horowitz",
+      "coverUrl": "",
+      "coverAccent": "#1E293B",
+      "pdfUrl": "",
+      "description": "Unvarnished operational lessons on leading companies through crisis, hard decisions, executive hiring, and wartime management.",
+      "summary": "Drawing on his years taking Loudcloud and Opsware from near-bankruptcy to acquisition, Ben Horowitz offers candid advice for founders facing tough trade-offs where standard playbooks break down.",
+      "keyTakeaways": [
+        "Manage your own psychology first; leaders set the emotional temperature during uncertainty.",
+        "Tell the truth directly, take care of people, products, and profits—in that order.",
+        "Peacetime and wartime leadership require fundamentally different operational cadences."
+      ],
+      "importantQuotes": [
+        "The hard thing isn’t setting a big, hairy, audacious goal. The hard thing is laying people off when you miss the big goal."
+      ],
+      "category": "Productivity & Business",
+      "subcategory": "Leadership & Operations",
+      "language": "English",
+      "tags": [
+        "Leadership",
+        "Startups",
+        "Management",
+        "Strategy"
+      ],
+      "publishedYear": 2014,
+      "pageCount": 10,
+      "difficulty": "Advanced",
+      "featured": true,
+      "popular": true,
+      "newlyAdded": true,
+      "addedDate": "2026-11-14",
+      "relatedBookIds": [
+        "book_the_obstacle_is_the_way_en",
+        "book_the_millionaire_fastlane_en"
+      ]
+    },
+    {
+      "id": "book_the_art_of_seduction_en",
+      "title": "The Art of Seduction",
+      "subtitle": "Historical archetypes of charm, social psychology, and persuasion",
+      "authorId": "author_robert_greene",
+      "coverUrl": "",
+      "coverAccent": "#7F1D1D",
+      "pdfUrl": "",
+      "description": "A historical study of charisma, psychological pacing, attention, and emotional intelligence across politics, art, and society.",
+      "summary": "Robert Greene profiles nine classic social archetypes and twenty-four strategic principles of persuasion—focusing on understanding people’s hidden desires, cultivating presence, and avoiding needy overreach.",
+      "keyTakeaways": [
+        "Genuine persuasion begins with deep attention to another person’s unspoken perspective.",
+        "Self-control and subtle pacing build lasting intrigue far better than forcefulness."
+      ],
+      "importantQuotes": [
+        "Everything depends on attention: make the other person feel genuinely understood."
+      ],
+      "category": "Psychology & Mindset",
+      "subcategory": "Social Strategy",
+      "language": "English",
+      "tags": [
+        "Psychology",
+        "Persuasion",
+        "Strategy",
+        "Charisma"
+      ],
+      "publishedYear": 2001,
+      "pageCount": 10,
+      "difficulty": "Intermediate",
+      "featured": false,
+      "popular": true,
+      "newlyAdded": false,
+      "addedDate": "2026-10-25",
+      "relatedBookIds": [
+        "book_what_every_body_is_saying_en",
+        "book_chanakya_niti_hi"
+      ]
+    },
+    {
+      "id": "book_the_magic_en",
+      "title": "The Magic",
+      "subtitle": "Twenty-eight days of deliberate daily gratitude",
+      "authorId": "author_rhonda_byrne",
+      "coverUrl": "",
+      "coverAccent": "#9A6B2F",
+      "pdfUrl": "",
+      "description": "A structured 28-day gratitude workbook transforming everyday health, work, relationships, and finances through intentional appreciation.",
+      "summary": "Rhonda Byrne outlines twenty-eight practical daily exercises designed to train attention toward abundance, calm reflection, and conscious appreciation in ordinary routines.",
+      "keyTakeaways": [
+        "Daily written gratitude rewires attention from chronic scarcity to calm appreciation.",
+        "Pair every morning start and evening rest with a concrete moment of thankfulness."
+      ],
+      "importantQuotes": [
+        "Whoever has gratitude will be given more, and attention follows what you appreciate."
+      ],
+      "category": "Self-Help & Personal Development",
+      "subcategory": "Gratitude Practice",
+      "language": "English",
+      "tags": [
+        "Gratitude",
+        "Daily Practice",
+        "Mindset",
+        "Self-Help"
+      ],
+      "publishedYear": 2012,
+      "pageCount": 8,
+      "difficulty": "Foundational",
+      "featured": false,
+      "popular": false,
+      "newlyAdded": true,
+      "addedDate": "2026-11-16",
+      "relatedBookIds": [
+        "book_the_secret_hi",
+        "book_what_to_say_when_you_talk_to_yourself_en"
+      ]
+    }
+  ]
+}

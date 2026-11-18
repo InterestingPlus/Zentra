@@ -1,0 +1,1525 @@
+# **ZENTRA — Complete Android Application Product Proposal**
+
+MASTER PROJECT BRIEF · GOOGLE AI STUDIO
+
+# **Zentra**
+
+**Your Personal Knowledge Universe.**
+
+Zentra is a beautifully designed, online-first digital book discovery and reading platform that brings books, authors, summaries, personal notes, and reading analytics together in one place.
+
+The experience should combine the content discovery of Netflix, the author discovery experience of Spotify, and the immersive reading experience of a beautifully designed physical book.
+
+Its central purpose is not just to let people open PDFs. It is to help them discover books, build a consistent reading habit, understand what they read, save important knowledge, and gradually build their own personal knowledge library.
+
+[Mobile Reading App - Dark Mode by Bella Namira on Dribbble](https://images.openai.com/static-rsc-4/Acpd0soy1Gt8_baItIhbprrmvTsl0Gj9CQ4w8Cnq8C36PY4ZJKQbAxBuZttpDgCvbqsGYbRqhWrlv9rBb8pntVLnSclz4O3aabAuB1_35bEeXlMyX0lNr77Md4FHqzdVbABzEQsgGR3GDZD9lvKAydVeyhObjWKjtqp77DVUkXk?purpose=inline)
+
+[Book shelf - Mobile app design by Zakariya Buhari on Dribbble](https://images.openai.com/static-rsc-4/Iq2n3J5ZgqPUua65aY2wQkfqRL6mPoNvFivyaXfqoaAKE6bXpn7TnhrK5vt_O-fbFZ_c_231bjvN2jZRgiZjNDhxP9rFK0VVDe-SzovBwvSPtSvqZD7vtJXbx12hXfv_hCO6YoCJifFJ8yhVyqgiKEMune_6NB-6lZjBB1viYZo?purpose=inline)
+
+[Book Reading App Design by Maria Plekhanova on Dribbble](https://images.openai.com/static-rsc-4/NXiYcaQChAoHoMIQLgaLvP2ll0s2XvBBGzzhv3xbJ6uHNGcRF1nHKEcNctgMJp2ZNRyUfpoRvON0PSjwcARwJcNueydlgJhrDV-q8XqDN0sxhN65OUlB7lHPZrJhgziDBvHf-fN7hvdQlzn8sM0njB6omgYmmdNQrUqW0MK5scU?purpose=inline)
+
+12
+
+## **1. Product vision and core principles**
+
+Zentra must be designed around these principles:
+
+1. **Online-first book discovery:** All book catalog information is fetched from the central online JSON catalog.
+2. **Offline-first personal data:** Reading progress, notes, bookmarks, highlights, reminders, and analytics must work without an internet connection.
+3. **Read anywhere:** Books can be read online or downloaded for offline reading.
+4. **Immersive reading:** The PDF reader should feel like reading a real book, not like opening an ordinary document viewer.
+5. **Knowledge management:** Important information collected while reading should be accessible from a centralized knowledge hub.
+6. **Personalized discovery:** Recommendations should become more relevant as the user reads, saves, and completes books.
+7. **No mandatory account:** The first version should not require registration, login, or personal account creation.
+8. **No unnecessary complexity:** No advertisements, subscriptions, payment systems, or forced social features in the initial release.
+
+## **2. Online book catalog and content management**
+
+The central book catalog will be hosted online at:
+
+`https://zentra.netlify.app/books/data.json`
+
+The application must fetch the catalog from this endpoint and use it as the primary source of book information.
+
+Every book should have:
+
+- Unique book ID
+- Book title
+- Subtitle, if available
+- Author ID and author name
+- Book cover image URL
+- PDF file URL
+- Short description
+- Full summary
+- Key takeaways
+- Category and subcategory
+- Language
+- Tags and keywords
+- Publication information, if available
+- Page count, if known
+- Featured/popular/newly-added status
+- Related books
+- Reading difficulty or level, if available
+
+Author information should be maintained in a separate authors collection in the same JSON catalog, so one author can be associated with multiple books.
+
+### **Suggested JSON structure**
+
+The following is an illustrative data format, not a requirement to use these exact sample books.
+
+```
+
+{
+  "version": 1,
+  "lastUpdated": "2026-11-18",
+  "books": [
+    {
+      "id": "book_001",
+      "title": "Example Book Title",
+      "subtitle": "An example subtitle",
+      "authorId": "author_001",
+      "coverUrl": "https://example.com/cover.jpg",
+      "pdfUrl": "https://example.com/book.pdf",
+      "description": "A short description of the book.",
+      "summary": "A detailed book summary.",
+      "keyTakeaways": [
+        "First important takeaway",
+        "Second important takeaway"
+      ],
+      "category": "Self Development",
+      "subcategory": "Personal Growth",
+      "language": "English",
+      "tags": ["Growth", "Mindset", "Learning"],
+      "pageCount": 250,
+      "featured": true,
+      "popular": false,
+      "relatedBookIds": ["book_002"]
+    }
+  ],
+  "authors": [
+    {
+      "id": "author_001",
+      "name": "Example Author",
+      "photoUrl": "https://example.com/author.jpg",
+      "bio": "Author biography and background.",
+      "description": "Additional author information.",
+      "bookIds": ["book_001"]
+    }
+  ],
+  "categories": [
+    {
+      "id": "self-development",
+      "name": "Self Development",
+      "description": "Books about personal growth.",
+      "coverUrl": "https://example.com/category.jpg"
+    }
+  ]
+}
+
+```
+
+### **Catalog loading behavior**
+
+- Fetch the JSON when the app launches.
+- Cache the latest successful catalog locally.
+- Refresh catalog data when the user opens the app or manually refreshes.
+- Avoid unnecessary repeated downloads of the same catalog.
+- Show cached books when the internet is unavailable.
+- Show proper loading, empty, and error states.
+- Handle missing cover images, author photos, summaries, or PDF links gracefully.
+- Validate catalog structure and handle version changes.
+- If a new book is added to the JSON, it should appear in the app after the next successful catalog refresh without requiring an app update.
+
+**Important:** The catalog is online, but it should not overwrite locally stored reading information. Catalog metadata and personal reading data must remain separate.
+
+## **3. Application navigation and main screens**
+
+Use a clean bottom navigation with five primary sections:
+
+Home
+
+Library
+
+Reading
+
+Knowledge
+
+Stats
+
+Suggested bottom navigation concept
+
+The user should also be able to access settings, reminders, favorites, and other secondary screens without overcrowding the main navigation.
+
+### **Screen A: Home**
+
+The home screen should feel like a premium streaming-platform discovery page.
+
+[A Book Discovery & Reader App by Wuraola Olaibi](https://images.openai.com/static-rsc-4/zFyG9_xhFh-mRtH_axuQd70kk0d5M3ej4IUyvAjYMjq_ZyDHOdgz4dvalWESjPj6poS1YPMqSlV_ew9r9KY0nK1vK6hButHhgfj1olwuHa4MyBMqbTCNs-P6QQMPEV9eF4X_TfzYucs0bAcU3SbJFZvudwUGcn5mxS1DEHc9684?purpose=inline)
+
+[ZenScript - Stop Scroll & Read | Devpost](https://images.openai.com/static-rsc-4/y9AtuxpV9I3yNiah5ynRiB7lRqaS9NGaZnlSol0plDigbqdTXXv0ZolG4N2WGkha9CLieno4Beou1JuQmvxc0_AId3J3fZ2m7ddUYxJi2yczSaBH8LRsAhCjOQa2TyIoEJPevPujWN8cE8Gt3c_bwcIdQKgLQiOproNbD2AW4TY?purpose=inline)
+
+[E-Library App - UI Design by Nadia Hashemi on Dribbble](https://images.openai.com/static-rsc-4/9DrgcdIFIwq0hWZc3LW15d_oHnGTwYQhxdBdwN_pfSmoPaXajJzztN66g2TkVK_6ULaYjcoWX9LdWSw7-bbuDRBgqxnfRVrITlKWJwRW1smYD3PVOREnqz4Q7569wct9rwe6zuy9CntKGyLuQ2y97RPmGIa2AT_c2uTuOuEftSQ?purpose=inline)
+
+12
+
+Include:
+
+- Personalized greeting.
+- Daily reading goal progress.
+- Current reading streak.
+- Continue Reading section.
+- Recently opened books.
+- Recommended For You.
+- Popular Books.
+- Featured Books.
+- Recently Added.
+- Category-based horizontal shelves.
+- Favorite authors.
+- Books you might like.
+- Explore All button.
+
+Book cards should display the cover, title, author, and relevant status. Tapping a book opens its details page.
+
+The Continue Reading section must be highly visible, so the user can resume reading with one tap.
+
+### **Screen B: Explore and Library**
+
+Provide a complete browsing and personal library experience.
+
+Features:
+
+- Search by title, author, category, tag, and keyword.
+- Search suggestions.
+- Category browsing.
+- Language filters.
+- Sort by popularity, newest, title, and author.
+- Favorites.
+- Downloaded books.
+- Currently Reading.
+- Completed Books.
+- Want to Read.
+- Recently Added.
+- Reading History.
+
+Suggested book categories:
+
+- Self Development
+- Psychology
+- Finance and Wealth
+- Business and Startups
+- Productivity
+- Entrepreneurship
+- Technology
+- Biography and Autobiography
+- Philosophy
+- Indian Spirituality
+- Bhagavad Gita
+- Vedas
+- Upanishads
+- Puranas
+- Ramayana and Mahabharata
+- History and Culture
+- Science and General Knowledge
+- Literature and Fiction
+
+Categories must be driven by the catalog, not permanently hardcoded.
+
+### **Screen C: Book Details**
+
+[Reading App by Dat Nguyen on Dribbble](https://images.openai.com/static-rsc-4/R77CKCqzPVDgIars9uZCG9GeIryFMUkvPYqjFl8EcFpxj-6fHzZV6RvsQwgI4qPewPsBr1sUqHsSPNSTN4GyXfLHCz0WcYunBa-Gfn1uHipomzslemG8vy3ztThTmtWcxmwQoAwS4uXEYCrNPWYBAW4Nc-4CxYpj1b1s_Sr6Moo?purpose=inline)
+
+[Reading & listening to books | Mobile app :: Behance](https://images.openai.com/static-rsc-4/1-O1I4iCNfpzz3sBw-AXve_cQNhVWohxTTei7CmqmAuH4jnO7jq3gcmklepxBXonyF4xCl5sOBJNiyDs0dBz2LEq4fpMsz3WjbHki73xAX6jkRcPwKKdbfUi9CnM5lz5xCCulx8LcaukMrJwbUTe1fDSVZWe167WfIFzXigzqCU?purpose=inline)
+
+[Ridi - Mobile Reading App by Lumino Design Studio on Dribbble](https://images.openai.com/static-rsc-4/U7qW_pXOGvqoUwQZACubxHO_6s-BiQE6oxW56WltgT8YnF5Ifvz9CfXlBGQ_ZGgLDdqlOOsUpT5YIi9gXdAleRxNNSCgxQm7idAdttpIWC4sr7fWtYFolhBuoAxy942sByojSQjOhU7zLsmMCg_4F12ky-j9gKrP-YWhNDFOwkc?purpose=inline)
+
+12
+
+Every book should have its own detailed page containing:
+
+- Large book cover.
+- Book title and subtitle.
+- Author name and clickable author profile.
+- Author photo thumbnail.
+- Category and language.
+- Short description.
+- Complete summary.
+- Key takeaways.
+- Page count, if available.
+- Reading status.
+- Favorite button.
+- Download status.
+- Related books.
+- More books by the same author.
+
+Primary actions:
+
+- **Read Now:** Open the PDF reader.
+- **Download:** Save the PDF for offline reading.
+- **Add to Favorites:** Save the book.
+- **Add to Reading List:** Mark it as Want to Read.
+
+The summary should be readable directly on this page. It should not be hidden behind unnecessary interactions.
+
+### **Screen D: Author Profiles**
+
+One of Zentra's distinctive features.
+
+[Reading Books App - Writer Profile by Danil on Dribbble](https://images.openai.com/static-rsc-4/4vFzlBDRg1jNAujlZP-V8VL6gDvSQqw3eR3sf8RdhPdtIGOMwN4fbPi2vsezcjOl5rggVYaZgUkAjtRGsBf5OpMxzjvZZ6m5R0ah0YLftlkjrD6_edVPoz0BYotM1y2gg6OgjOL5RdyUMg1VPIfbIAhlEBT9w90lnLKVOfxUxDI?purpose=inline)
+
+[Author Mobile Concept by Herman Mahal on Dribbble](https://images.openai.com/static-rsc-4/JG5jBSDdF-MNYNLSSzTOayWu_NIEdwnCWdn8QWqKUvRHcINiivJJDlZn7ZHCpszTytdLS5lnqUMV1-a9kdxfEpr3n-X_4HekEQHWuN8bzVMgQgVzBs5byFEGgx-f5eNQlQwc_AAjge7uz5fFGaaKxHeUvzuFUoWJapsauh1pg14?purpose=inline)
+
+[Home](https://images.openai.com/static-rsc-4/T0gIOrSlAjpKYXdnqXwo63wnK0_72_SE8amjGU5_BI1dQvauZjeIkMWtSdGkrsAbmvux_imsr9_dJ6_Lb8UAU_EBR3ewgr8Xe7UXotl3gSM6OdyejT1UTY3n6SyeWp_86BoCZBci-wHkebi7GRvBRp-dslY444-NJ_n0njle0kM?purpose=inline)
+
+9
+
+Author profiles should work similarly to Spotify artist pages.
+
+Each author page should contain:
+
+- Large author photograph.
+- Author name.
+- Biography.
+- Background and introduction.
+- Areas of expertise or writing topics.
+- Total number of books available in Zentra.
+- All books by this author.
+- Popular books by this author.
+- Related authors, where metadata supports it.
+
+Tapping any author name anywhere in the app should open the same author profile.
+
+Books should be connected through `authorId`, not just matching author names. This avoids duplicate profiles caused by inconsistent spelling.
+
+## **4. Immersive PDF reading experience**
+
+Core feature of Zentra
+
+The reader is the most important part of the entire application. It must feel premium, distraction-free, and comfortable for long reading sessions.
+
+[My Beef with Books — Basic Apple Guy](https://images.openai.com/static-rsc-4/hbY1hsj0vaixpCLmmjFnGeIMAUIOK8NhgDZfFk7qLme2pXFMvWktDOna7jgMeBgsjFvw6f-oBG87wTlNzm8cKKUm2KA3-RvPMeeQGuydHi28EVQLuxX76uP1P4U6MMdWbnwV1kb3b20AACsSN969Bq3QQwF-XlLGEEm5VxVhbsU?purpose=inline)
+
+[Inside Apple Books -- the best app for book lovers](https://images.openai.com/static-rsc-4/45cvjOPuj1aRzE26Wf3umwlYVslG7RZzQiHPs9sjp-9AQiiqnv6NW9adNuPLxFRr_rIus1yHfIhT69VU5LocZNJ-uSNeR35dt791L5R5PclQ68tkhhBAJQA44VvIVMmybZHdYCrNRZRi-T9sJUiyv1vzWLx8jZ2xHJk0gJBuFjk?purpose=inline)
+
+[Book Reading App Design for iPad by Emre Baştaş on Dribbble](https://images.openai.com/static-rsc-4/QYukgwW_xcD3hPCVOaGrdmaq3VTNeBcebHmckBW92WLDKsuiIVpXVb2w8ruwYPeRuXRDA2mLyeKzy3lW0B3S-K-i3eb-e4sXv3txBsR24hUIW4QG07FqI12Bopm2skGuhhyrs3SPvwSdSd6Hywa-3mTO2MyCIx16rzHigTEqges?purpose=inline)
+
+10
+
+### **Reading modes**
+
+**A. Single-page mode**
+
+- One PDF page at a time.
+- Recommended default for portrait phones.
+- Swipe horizontally to navigate.
+- Smooth transitions.
+
+**B. Double-page book mode**
+
+- Two pages displayed together, like an open physical book.
+- Suitable for landscape mode and larger screens.
+- Optional on phones where the display can accommodate it comfortably.
+- Realistic center spine, subtle shadows, page margins, and page-turn animations.
+
+The correct conventional book arrangement should be followed:
+
+- First page: right side, with a blank left side.
+- Second and third pages: left and right.
+- Fourth and fifth pages: left and right.
+
+Provide an optional page-alignment setting for PDFs that have unusual cover pages or front matter.
+
+### **Page navigation and controls**
+
+- Swipe to turn pages.
+- Animated page curl or flip effect.
+- Tap left/right page edges to navigate.
+- Page number indicator.
+- Jump to a specific page.
+- Reading progress percentage.
+- Zoom in/out.
+- Fit to width and fit to page.
+- Fullscreen reading mode.
+- Screen brightness control, where supported.
+- Keep screen awake while reading.
+- Landscape and portrait orientation.
+- Optional vertical-scroll reading mode.
+- Search within PDF text when the document supports text extraction.
+
+### **Reader appearance**
+
+Provide:
+
+- Light reading interface.
+- Dark app interface with a comfortable reading surface.
+- Sepia reading mode, where technically possible.
+- Adjustable margins and page spacing.
+- Hide/show reading controls.
+
+A crucial distinction: ordinary PDFs have fixed page layouts. Zentra should not promise arbitrary font resizing or recoloring of the original PDF page content. Reader controls and surrounding UI can be themed, but modifying the PDF itself is a separate advanced capability.
+
+### **Continue Reading and automatic progress**
+
+The app must automatically remember:
+
+- Last opened book.
+- Exact last page.
+- Current spread.
+- Reading position, where available.
+- Last reading timestamp.
+- Total time spent reading.
+- Reading status.
+
+When the user opens a book again, it should resume from the last saved position.
+
+Progress must be saved periodically and when the reader closes or moves to another screen. Avoid losing progress if the app is interrupted.
+
+## **5. Online reading and offline downloads**
+
+Zentra should support two reading modes without making the user think about the underlying complexity.
+
+[Flat vector illustration of online reading, learning or education concept. Stack of books into the mobile phone on blue background with big white cloud.](https://images.openai.com/static-rsc-4/71Kg3BgO1bYaOZkfQW5LvdCL9uJW8Fd0nRltizvvDpGfAYqncbf1Ju69fxhgbhQEO06QjfyCtCrSFsqAA7bQFZMTkLq_ACIm_d-GDO35qQ07RffO9t3PAH7WuhE9w4QyZcOV14De0ywrYLw2DzgDW_4Zy2bcID_MaZlaQXn9Y_xiYoNNp3uKXo22MDk4xq_s?purpose=inline)
+
+**Online Reading**
+
+Internet required
+
+- Load the PDF from its online URL.
+- No mandatory full download.
+- Save progress locally.
+- Resume from the last page.
+
+[Download book. E-book marketing, content marketing, ebook download on smart phone . Vector illustration.](https://images.openai.com/static-rsc-4/cXfqHB4ej-Z0eXZowR8xtlHmCtF6YpdnMnCkejgnUeUksCZwftFS7sqFM-812G4Nf9vhZphP_6CZ754rpMeaRXsvlzh4BORI8imIeNeDZtauXgtFcsl2esKNs3SfrZRBqHnCSQ-AcDJDgADowL1zVG53lU-C-9DSxEaZ6nJoljemRCv2BK3RFoJRGgQCtsJh?purpose=inline)
+
+**Offline Reading**
+
+Internet not required
+
+- Download PDF into app storage.
+- Show download progress.
+- Open downloaded PDF without internet.
+- Preserve reading progress.
+
+### **Download manager**
+
+Every book should have a download action.
+
+Download states:
+
+- Not Downloaded.
+- Waiting.
+- Downloading.
+- Paused.
+- Download Failed.
+- Downloaded.
+- Updating, if a new file version is available.
+
+Features:
+
+- Download progress percentage.
+- Download cancellation.
+- Retry failed downloads.
+- Downloaded file size.
+- Available storage information.
+- Delete downloaded file.
+- Downloaded Books section.
+- Prevent duplicate downloads.
+- Detect interrupted downloads and recover safely.
+- Verify downloaded file integrity before marking it ready.
+
+Downloaded PDFs must be stored inside Zentra's managed app storage, not automatically placed in the phone's public Downloads folder.
+
+Deleting an offline copy must never delete the original online file.
+
+### **Offline behavior**
+
+When there is no internet connection:
+
+- Open cached book catalog.
+- Display locally available book covers where cached.
+- Open downloaded PDFs.
+- Restore last reading positions.
+- Create and edit notes.
+- Add highlights and bookmarks.
+- Track reading time.
+- Update reading statistics.
+- Use locally scheduled reminders.
+
+For books that are not downloaded, show an understandable offline-unavailable message rather than a broken reader.
+
+## **6. Highlights, annotations, bookmarks, and notes**
+
+Zentra should be more than a reader. It should help users collect and revisit knowledge.
+
+[Reading  |  Gallery  |  Android Developers](https://images.openai.com/static-rsc-4/4JdV4oH1MCV2XOxl35NHJTdt_BU3r1K05NAAOfTYfAY-rDB2wVW5UuEunNXuU5yq5Y-6Dt4tbtV5BE0Zi_pyQf2OeELq4HITlaR5D21yHAHrGYR3r92SFiQWnYdvFgxV7smW-n3iwXEkMpmbPHY0eMeo9aUm9Grs6mrAhR30AlI?purpose=inline)
+
+[GitHub - Rics-Dev/uRead: eBook and audiobook reader for Android · GitHub](https://images.openai.com/static-rsc-4/sBvOLuGhFO4VtO0m6UnEgScNFfBpcLsdl18JUNMt5vNrDBdiz7W6PAWpepB31s6ozBqyQndrwbTerJmNvO6Qz0Oiagv_Y5LB808PSYwNRbg6Dhu60nQr_683AB4ChZ2Z4ZU1Nkr7VWsYBmHMOd1FZM4xE6lYV6KaDAAgIZTDT7E?purpose=inline)
+
+[MidnightReads – Dark Mode Reading App UI Design 📚✨ by Abdullah Noman  on Dribbble](https://images.openai.com/static-rsc-4/bNVoUWekyWG0WvwpUYb2yzVgIB-sQgshBJ8HED0Q-A702zGqZKwYMnZObifc1ysZCwyWg4KSpOn3Z0J6M3HF_NglG82NPbiFwexu4pOUhyptPcj_u21xUYWdwkSYflixPRTae5E3t_Ljggt6h2xgCw-MlhPvpqnrbq836C_xI58?purpose=inline)
+
+10
+
+### **Highlighting**
+
+- Select PDF text and highlight it.
+- Multiple highlight colors.
+- Save selected text.
+- Store associated book and page.
+- Reopen the original page from a saved highlight.
+- Edit or delete highlights.
+
+### **Notes**
+
+- Create personal notes while reading.
+- Attach notes to a page or a specific highlight.
+- Edit and delete notes.
+- Add titles to notes.
+- Search notes by keyword.
+- View all notes in one place.
+
+### **Bookmarks**
+
+- Bookmark any page.
+- Add custom bookmark names.
+- View all bookmarks for a book.
+- Jump directly to bookmarked pages.
+- Delete bookmarks.
+
+### **Important technical behavior**
+
+Text selection and highlighting should work where the PDF contains selectable text. Scanned PDFs may require OCR and should not be advertised as universally selectable without that support.
+
+Annotations must store stable page coordinates or equivalent position information in addition to page numbers, so highlights remain attached to the right text after changes in zoom or screen size.
+
+## **7. My Knowledge Hub**
+
+[MidnightReads – Dark Mode Reading App UI Design 📚✨ by Abdullah Noman  on Dribbble](https://images.openai.com/static-rsc-4/bNVoUWekyWG0WvwpUYb2yzVgIB-sQgshBJ8HED0Q-A702zGqZKwYMnZObifc1ysZCwyWg4KSpOn3Z0J6M3HF_NglG82NPbiFwexu4pOUhyptPcj_u21xUYWdwkSYflixPRTae5E3t_Ljggt6h2xgCw-MlhPvpqnrbq836C_xI58?purpose=inline)
+
+[Organized Knowledge (Notes App Concept UI) by Anna Filou on Dribbble](https://images.openai.com/static-rsc-4/K-VSnIAIsNMQhkjaUJkg7axpp6lUGnNGtRWo6ixknLEuIUjuOWwXQl9frYC9xC2JtRE9FWs_EJ1XnGd49yMzn8b44ETiBkn8xGv1bgE1aoJlV_nk5wyIhNtYw4Mi-LrjT69gO-4Jlr0Q9rff1lpSU2P7GZkzY9djMEgZ70lbSJU?purpose=inline)
+
+[Scan & Save Book Quotes | Quotely | Product Hunt](https://images.openai.com/static-rsc-4/39UX3UpCHe9CU6QX4Z583cGaxz-A-CYG2CO1149Ru4WZXU3yXkjl2Y1mzmTtes0n0D-oEiFxB_IAHzSXrY8giAYQlAxr8cqL_kCMiPJYy5P5th6a7VL4gxyZL5exsGv1WcFy9ZzEhjqTt4SW0wt2LE3q9Zb-6vdpKOuyuNCL998?purpose=inline)
+
+10
+
+A dedicated section that collects everything the user saves while reading.
+
+Tabs or filters:
+
+1. All Notes
+2. Highlights
+3. Bookmarks
+4. Important Quotes
+5. Book Summaries
+
+Each saved item should show:
+
+- Its content.
+- Book title and cover.
+- Author name.
+- Page number.
+- Date created.
+- A direct action to open the original page.
+
+Users should be able to search across all saved notes and highlights.
+
+The Knowledge Hub should be a central destination, not just a collection of disconnected features inside individual books.
+
+## **8. Book summaries and learning support**
+
+Every book can have a summary supplied by the online catalog.
+
+The book detail page should display the complete available summary and important takeaways.
+
+The summary experience should support:
+
+- Short overview.
+- Detailed summary.
+- Chapter-wise summary, if available.
+- Key ideas.
+- Important lessons.
+- Practical applications.
+- Important concepts and quotes, where provided.
+
+### **Text-to-speech**
+
+Provide a Listen Summary option.
+
+- Read the summary aloud using the device's available text-to-speech voice.
+- Play/pause.
+- Change reading speed where supported.
+- Resume from the previous position.
+- Background playback where supported.
+
+This feature is for summaries, not a promise of automatically generated audiobooks for every PDF.
+
+Do not make an external AI service mandatory for summaries in the initial version. Display catalog-provided summaries and gracefully handle books without summaries.
+
+## **9. Daily reading goals and reminders**
+
+Zentra should help users build a consistent reading habit without becoming an annoying notification machine. Humanity has enough of those.
+
+### **First-launch reading setup**
+
+During onboarding, allow users to configure:
+
+- Daily reading goal: 10, 15, 20, 30, 45 minutes, or custom.
+- Preferred reading days.
+- Reminder time.
+- Optional second reminder.
+- Notification preferences.
+
+### **Reminder features**
+
+- Daily reading reminder.
+- Reminder to continue an unfinished book.
+- Daily goal progress reminder.
+- Optional weekly reading report.
+- Reminder for books not opened for a configurable number of days.
+- Skip today.
+- Pause reminders.
+- Vacation mode.
+- Quiet hours.
+- Enable/disable individual reminder types.
+
+### **Smart reminder behavior**
+
+- Do not send reminders after the daily reading goal has been reached.
+- Avoid duplicate reminders.
+- Limit reminders to a sensible number per day.
+- Do not disturb during configured quiet hours.
+- Respect selected weekdays.
+- Reschedule reminders after device reboot or schedule changes, where supported.
+
+Notifications must be scheduled locally on the device. They must not depend on a continuously running server.
+
+## **10. Reading analytics and statistics**
+
+[justRead: EPUB & PDF Reader for iPhone and iPad | justRead.app](https://images.openai.com/static-rsc-4/uA-V7ZRc7mWF28Bjv6ndTnm06u6RYgMbX5OrreKaitkNvgiqydHCXCzaXSlu_FxlehFCONSIKO1xYxtJH3FVG9Ac636rHbYLK5LWSsBqg1Hz7qkA2PS6YrEGQJi2RJ6RLCvd41Uegrjaef-nhqOmiVtqXXFKbHKhSxmYL9lUQIg?purpose=inline)
+
+[Book Reading Habit: Finally read the books you buy | Product Hunt](https://images.openai.com/static-rsc-4/YhgI83wxEkuJVTfZjVue1YU-v_-FI1hyEIvUp2L14YiGvnxIQfnYWHR6S9FIQO2B5ezAX0HjgFfwAc7cV3uCiEUZ1CCgc5swfFnN0m2SRZLVLCBiZyxeAHmCAug5KBeLBBD_jllQlFM24t4B8ySNFcZcUn87XCTKtU_ScHEWzLM?purpose=inline)
+
+[Next in the Series: New updates to our favourite reading apps 📚 |](https://images.openai.com/static-rsc-4/xbjFdghNZFR5brUqkOtEfnKkWN5m33VD7MloJz_1FW18ZNYxEDEA-QTDflUxMPFZJpkK59lz_AvsdOO57qQ4CvBPFOytF0cTLznqkvRvUBrmMryva3DWE0YxK3jPHPeJjBSSveAlqEo97Arqx5yEbNHksCFvXuEzKoVGDlZk23Q?purpose=inline)
+
+9
+
+Provide a dedicated Stats screen.
+
+### **Personal reading dashboard**
+
+Display:
+
+- Total books in catalog.
+- Books currently being read.
+- Books completed.
+- Books in Want to Read.
+- Total pages read.
+- Total reading time.
+- Average reading time per day.
+- Current reading streak.
+- Longest reading streak.
+- Daily goal completion rate.
+
+### **Charts**
+
+- Weekly reading activity.
+- Monthly reading activity.
+- Pages read over time.
+- Reading time over time.
+- Books completed by month.
+- Category-wise reading distribution.
+
+### **Achievements**
+
+Optional achievement badges:
+
+- First Book Started.
+- First Book Completed.
+- 100 Pages Read.
+- 7-Day Reading Streak.
+- 30-Day Reading Streak.
+- 5 Books Completed.
+- 10 Books Completed.
+
+All analytics must be generated from locally stored reading sessions and progress records. Do not fabricate reading time or count time when the PDF is not actively being read.
+
+## **11. Personalized recommendations**
+
+The recommendation system should work without requiring a user account or a backend recommendation service.
+
+It should use locally available signals:
+
+- Favorite books.
+- Favorite authors.
+- Categories of books read.
+- Reading history.
+- Completed books.
+- Current reading interests.
+- Saved books.
+- Tags and metadata.
+- Recently viewed books.
+
+### **Recommendation sections**
+
+- Recommended For You.
+- Similar Books.
+- More From This Author.
+- Because You Read...
+- Explore a New Category.
+- Popular in Your Interests.
+- Continue Your Journey.
+
+The recommendation engine should not repeatedly show the same books unnecessarily. Provide a way to dismiss recommendations or mark a book as Not Interested.
+
+## **12. Favorites, reading lists, and personal organization**
+
+Users should be able to organize books independently of their reading progress.
+
+Provide:
+
+- Favorites.
+- Want to Read.
+- Currently Reading.
+- Completed.
+- Custom reading lists.
+- Recently Viewed.
+- Downloaded Books.
+
+A book may belong to multiple lists. For example, a book can be both a Favorite and Currently Reading.
+
+The user should be able to change a book's reading status manually, while Zentra can also suggest status changes based on reading activity.
+
+## **13. Onboarding and first-time experience**
+
+The first launch should feel polished and welcoming, not like a lengthy registration form.
+
+[Matter: Reading App UI Breakdown | ScreensDesign Showcase](https://images.openai.com/static-rsc-4/dP3Qz_Qfo2B6IENOHdDGbWFVQ6z1v-x42ehCpDtRP7CMQrdnqtID_WTous0BTKh5TgIHL1sv2sBNpEHK1KEIPJKtgsFRFapmdSFNlxBlUssqZpJIuepcIAnL2NGaFzpJyIZ--f5QWtbshneIXFXr0JMhcX01hLIVEZg-KfRktEA?purpose=inline)
+
+Suggested onboarding flow:
+
+1. **Welcome to Zentra:** Introduce the app and its purpose.
+2. **Choose your reading goal:** Select daily minutes.
+3. **Choose reading days:** Select preferred weekdays.
+4. **Set reminder time:** Configure local notifications.
+5. **Choose interests:** Select categories such as self-development, finance, business, spirituality, and philosophy.
+6. **Explore the library:** Fetch the online catalog and display the available books.
+
+No login, signup, email verification, phone number, or account creation should be required.
+
+Notification permission should be requested at an appropriate point, after explaining why Zentra needs it.
+
+Users should be able to change all onboarding preferences later from Settings.
+
+## **14. Settings and personalization**
+
+Provide a dedicated Settings screen with:
+
+**Reading preferences**
+
+- Default reading mode.
+- Page transition preference.
+- Keep screen awake.
+- Default reader theme.
+- Reading orientation.
+- Default text/search preferences where supported.
+
+**Appearance**
+
+- Light theme.
+- Dark theme.
+- System default.
+- Accent color or theme customization, if supported.
+
+**Notifications**
+
+- Daily reminders.
+- Reminder schedule.
+- Quiet hours.
+- Weekly reports.
+- Unfinished-book reminders.
+- Pause notifications.
+
+**Library**
+
+- Refresh catalog.
+- Downloaded file management.
+- Storage usage.
+- Clear image cache.
+- Download management.
+
+**Data and backup**
+
+- Export personal reading data.
+- Import personal reading data.
+- Backup and restore.
+- Export notes and highlights.
+- Manage downloaded PDFs.
+
+**About Zentra**
+
+- App version.
+- Catalog version.
+- Privacy information.
+- Terms and content information.
+- Contact/support information, if available.
+
+## **15. Local data storage and backup**
+
+Although the book catalog is online, personal data must remain on the user's device.
+
+The following information must be stored locally:
+
+| Data                | Storage behavior          |
+| ------------------- | ------------------------- |
+| Reading progress    | Local                     |
+| Reading sessions    | Local                     |
+| Notes               | Local                     |
+| Highlights          | Local                     |
+| Bookmarks           | Local                     |
+| Favorites           | Local                     |
+| Reading lists       | Local                     |
+| Daily goals         | Local                     |
+| Reminder schedules  | Local                     |
+| Reading analytics   | Local                     |
+| Downloaded PDFs     | App-managed local storage |
+| Cached book catalog | Local cache               |
+| Cached covers       | Local cache               |
+
+### **Backup and restore**
+
+Because there is no mandatory account or cloud sync, Zentra must include a backup mechanism.
+
+Allow users to:
+
+- Export their personal reading data.
+- Export notes and highlights.
+- Create a backup file.
+- Restore a backup on the same or another device.
+- Optionally include downloaded PDFs in a full backup.
+
+A data-only backup should be small. A full backup may be large because it includes PDFs.
+
+Restore should handle duplicate books, incompatible backup versions, and failed imports safely.
+
+Display a clear reminder that uninstalling the app or losing the device may erase local data unless the user has made a backup.
+
+## **16. Visual design and user experience**
+
+Zentra should look like a premium modern reading product, not a generic PDF utility.
+
+### **Design direction**
+
+[Book Reading App Design by Maria Plekhanova on Dribbble](https://images.openai.com/static-rsc-4/NXiYcaQChAoHoMIQLgaLvP2ll0s2XvBBGzzhv3xbJ6uHNGcRF1nHKEcNctgMJp2ZNRyUfpoRvON0PSjwcARwJcNueydlgJhrDV-q8XqDN0sxhN65OUlB7lHPZrJhgziDBvHf-fN7hvdQlzn8sM0njB6omgYmmdNQrUqW0MK5scU?purpose=inline)
+
+**Dark theme**
+
+Deep charcoal backgrounds, restrained contrast, beautiful book covers and comfortable reading surfaces.
+
+[Read.io - Mobile Reading App by DesiznLab Studio on Dribbble](https://images.openai.com/static-rsc-4/ZbFyFknD4XEgv7Cg4_Ppv_gwP3PH3NTn8vCO1x-UlEU30vIgS3efZj1pLM9M7pB8Hm5dH-gmMrrERopQO-z1wBxeZCP98YayrNuDi6NyYJN-XUkGbjNASVxAYTDWouMjjrowIp8amoZolvKwz5UvLJg77yrSLBqwlq2MKDuojPM?purpose=inline)
+
+**Light theme**
+
+Warm white surfaces, subtle borders, editorial typography and generous spacing.
+
+### **Visual requirements**
+
+- Premium typography.
+- Beautiful book-cover cards.
+- Consistent spacing and alignment.
+- Smooth animations.
+- Rounded cards without excessive decoration.
+- Subtle shadows and depth.
+- Elegant icons.
+- Clear loading skeletons.
+- Empty states with useful guidance.
+- Consistent button styles.
+- Accessible contrast and touch targets.
+
+### **Interaction requirements**
+
+- Smooth navigation.
+- No unnecessary loading screens.
+- Responsive book shelves.
+- Clear download feedback.
+- No accidental page changes while selecting text.
+- Proper back navigation from reader, author, and book detail screens.
+- Preserve scroll position when returning to a previous screen.
+- Handle slow internet and failed requests gracefully.
+
+Use the name **Zentra** consistently throughout the application. The brand should communicate knowledge, exploration, and calmness.
+
+## **17. Data architecture and important system rules**
+
+The app must separate three kinds of information.
+
+**A. Central online catalog**
+
+Online source of truth
+
+Book metadata, author profiles, categories, descriptions, summaries, covers, and PDF URLs.
+
+**B. Local personal database**
+
+Device source of truth
+
+Reading progress, sessions, notes, highlights, bookmarks, favorites, lists, goals, reminders, and analytics.
+
+**C. Local file storage**
+
+Offline assets
+
+Downloaded PDFs, cached covers, and exported backup files.
+
+### **Required relationships**
+
+- One author can have many books.
+- One book can have many notes.
+- One book can have many highlights.
+- One book can have many bookmarks.
+- One book can have many reading sessions.
+- One user device can have many reading lists.
+- One reading list can contain multiple books.
+- A book's catalog ID must remain stable across catalog updates.
+
+### **Important synchronization rules**
+
+- Catalog updates must never reset reading progress.
+- A missing catalog entry must not automatically delete its local notes or history.
+- If a book's PDF URL changes, the app should handle the new URL without destroying the existing offline file.
+- A failed catalog refresh should not erase the last successful catalog.
+- Reading progress should remain associated with the stable book ID.
+- Downloaded books must be identifiable even when the catalog cannot be reached.
+- Local database migrations must preserve existing user data.
+
+## **18. Reliability, security, and performance**
+
+The application must be designed for real usage, not just a beautiful demonstration.
+
+### **Network reliability**
+
+- Handle offline startup.
+- Use cached catalog data.
+- Handle timeouts and server errors.
+- Retry transient failures sensibly.
+- Avoid downloading the same large PDF repeatedly.
+- Support HTTP range requests when the PDF host supports them.
+- Handle redirects and unavailable PDF links.
+- Avoid blocking the entire app while loading a large PDF.
+
+### **File reliability**
+
+- Verify PDF downloads.
+- Handle interrupted downloads.
+- Prevent corrupted partial files from being treated as complete.
+- Avoid duplicate storage.
+- Preserve user data when the app is updated.
+- Handle low-storage conditions.
+
+### **Privacy and security**
+
+- No unnecessary personal information collection.
+- No hidden tracking.
+- No mandatory analytics service.
+- No exposed private credentials or API keys.
+- Use secure network connections.
+- Validate remote catalog content before rendering it.
+- Do not allow remote metadata to execute code or control app behavior.
+
+### **Accessibility**
+
+- Support readable text sizes.
+- Maintain adequate color contrast.
+- Provide meaningful labels for interactive controls.
+- Ensure navigation and buttons are accessible.
+- Support device accessibility settings wherever possible.
+
+## **19. Suggested application structure**
+
+Organize the application into these functional modules:
+
+| Module           | Responsibilities                             |
+| ---------------- | -------------------------------------------- |
+| Home             | Discovery, recommendations, continue reading |
+| Catalog          | Online JSON fetching and caching             |
+| Books            | Book details, search, categories             |
+| Authors          | Profiles and author collections              |
+| Reader           | PDF viewing and navigation                   |
+| Downloads        | Offline PDF management                       |
+| Knowledge        | Notes, highlights, bookmarks                 |
+| Summaries        | Book summaries and text-to-speech            |
+| Reminders        | Reading schedules and notifications          |
+| Statistics       | Progress, habits, achievements               |
+| Personal Library | Favorites, lists, reading statuses           |
+| Settings         | Appearance, preferences, backup              |
+
+These modules should be logically separated, making future improvements possible without rewriting the entire application.
+
+## **20. Development roadmap**
+
+Build Zentra in carefully tested phases rather than trying to implement every feature simultaneously.
+
+1. **Phase 1: Foundation and brand**
+   - App structure and navigation.
+   - Zentra branding.
+   - Light and dark themes.
+   - Onboarding.
+   - Online JSON catalog integration.
+   - Catalog caching and error handling.
+2. **Phase 2: Discovery and library**
+   - Home screen.
+   - Search and filters.
+   - Categories.
+   - Book details.
+   - Author profiles.
+   - Favorites and reading lists.
+3. **Phase 3: PDF reader**
+   - Online PDF reading.
+   - Single-page and double-page modes.
+   - Page navigation.
+   - Page-turn animation.
+   - Progress saving and restoration.
+   - Reader settings.
+4. **Phase 4: Offline downloads**
+   - PDF downloads.
+   - Download manager.
+   - Offline library.
+   - Download recovery.
+   - Online/offline reading continuity.
+5. **Phase 5: Knowledge management**
+   - Highlights.
+   - Notes.
+   - Bookmarks.
+   - Central Knowledge Hub.
+   - Search across saved knowledge.
+6. **Phase 6: Reading habits**
+   - Daily goals.
+   - Local reminders.
+   - Reading sessions.
+   - Streaks.
+   - Statistics and achievements.
+7. **Phase 7: Learning and personalization**
+   - Book summaries.
+   - Chapter-wise summaries where available.
+   - Text-to-speech.
+   - Personalized recommendations.
+   - Related books and authors.
+8. **Phase 8: Quality assurance and release**
+   - Offline testing.
+   - Device restart testing.
+   - Download interruption testing.
+   - Large PDF testing.
+   - Database migration testing.
+   - UI and performance optimization.
+   - Final Android release build.
+
+## **21. Future possibilities (not part of v1)**
+
+Keep the architecture extensible for future features, but do not implement them in the first release:
+
+- Optional user accounts.
+- Cloud backup and cross-device synchronization.
+- Reading communities.
+- Public book reviews and ratings.
+- Sharing notes and quotes.
+- Reading challenges with friends.
+- Social profiles.
+- AI-powered book discovery.
+- AI-powered summaries.
+- Website-based reading experience.
+
+These features must not delay or complicate the initial offline-capable application.
+
+# **22. Master instructions for Google AI Studio**
+
+The following is the implementation brief that should guide the AI while building Zentra.
+
+# PROJECT: ZENTRA
+
+## Complete Android Application Development Brief
+
+You are an expert mobile application architect, senior application developer, product designer, and QA engineer.
+
+Your task is to build **Zentra**, a complete, production-minded Android digital book discovery and reading application.
+
+### PRODUCT IDENTITY
+
+**Name:** Zentra
+
+**Tagline:** Your Personal Knowledge Universe.
+
+**Product concept:** An online-first digital book library with immersive PDF reading, author discovery, offline downloads, personal knowledge management, reading goals, reminders, and analytics.
+
+The experience should combine:
+
+- Netflix-style content discovery.
+- Spotify-style author profiles and collections.
+- A premium physical-book-inspired reading experience.
+- A personal knowledge management system.
+
+### CORE REQUIREMENTS
+
+1. Android application only for the initial release.
+2. No mandatory login, signup, or user account.
+3. No advertisements or monetization in v1.
+4. Online book catalog sourced from:\
+   `https://zentra.netlify.app/books/data.json`
+5. Book metadata and author information are fetched online and cached locally.
+6. Reading progress, reading history, notes, highlights, bookmarks, favorites, reminders, and analytics are stored locally.
+7. PDFs can be read directly from their online URLs.
+8. Users can download PDFs into app-managed storage for offline reading.
+9. Downloaded PDFs must remain accessible without internet.
+10. Online and offline reading must share the same reading progress.
+11. The app must remain useful when internet connectivity is unavailable.
+
+### BOOK CATALOG
+
+The central JSON catalog contains:
+
+- Books.
+- Authors.
+- Categories.
+- Book-to-author relationships.
+- Book descriptions and summaries.
+- Cover image URLs.
+- PDF URLs.
+- Tags and related-book IDs.
+
+Each book has a stable unique ID. Each author has a stable unique ID. Multiple books can reference the same author ID.
+
+Fetch and cache the catalog. Support refresh, version checking, error handling, and offline fallback.
+
+Do not hardcode the entire catalog into application screens.
+
+New catalog entries must become available without publishing a new application version.
+
+Keep catalog metadata separate from local user reading data.
+
+### REQUIRED MAIN SCREENS
+
+1. Home
+2. Explore / Search
+3. Library
+4. Book Details
+5. Author Profile
+6. PDF Reader
+7. Downloads
+8. Knowledge Hub
+9. Reading Statistics
+10. Reminders
+11. Settings
+
+Use a polished bottom navigation with five primary sections:
+
+- Home
+- Library
+- Reading
+- Knowledge
+- Stats
+
+Provide access to Explore, Downloads, Authors, and Settings through suitable navigation and contextual actions.
+
+### HOME SCREEN
+
+Include:
+
+- Personalized greeting.
+- Daily reading goal.
+- Reading streak.
+- Continue Reading.
+- Recently Opened.
+- Recommended For You.
+- Popular Books.
+- Featured Books.
+- Recently Added.
+- Category shelves.
+- Favorite Authors.
+- Related Books.
+
+Use horizontal book shelves and attractive book-cover cards.
+
+### BOOK DISCOVERY
+
+Implement:
+
+- Search by book title.
+- Search by author.
+- Search by category.
+- Search by tags and keywords.
+- Category filters.
+- Language filters.
+- Sorting.
+- Favorites.
+- Want to Read.
+- Currently Reading.
+- Completed.
+- Recently Viewed.
+- Downloaded Books.
+
+### BOOK DETAILS
+
+Show:
+
+- Cover image.
+- Title and subtitle.
+- Author and author photo.
+- Description.
+- Summary.
+- Key takeaways.
+- Category and language.
+- Page count when available.
+- Reading status.
+- Download status.
+- Related books.
+- More Books by This Author.
+
+Actions:
+
+- Read Now.
+- Download.
+- Add to Favorites.
+- Add to Reading List.
+
+### AUTHOR PROFILES
+
+Create Spotify-inspired author profiles.
+
+Each profile includes:
+
+- Author photograph.
+- Author name.
+- Biography.
+- Introduction.
+- Areas of expertise.
+- Available books.
+- Popular books.
+- Related authors when data is available.
+
+Use author IDs to associate books with authors. Tapping an author name anywhere must open the correct profile.
+
+### PDF READER
+
+The reader is a core product feature and must receive special attention.
+
+Support:
+
+- Online PDF reading.
+- Downloaded offline PDF reading.
+- Single-page reading mode.
+- Double-page book spread.
+- Portrait and landscape layouts.
+- Smooth horizontal page navigation.
+- Page-turn animation.
+- Page numbers.
+- Jump to page.
+- Zoom.
+- Fit to page.
+- Fullscreen.
+- Reading progress.
+- Screen-awake option.
+- Optional vertical scrolling.
+- PDF text search where supported.
+
+The double-page layout must follow conventional book pagination:
+
+- Page 1 on the right with a blank left side.
+- Pages 2 and 3 together.
+- Pages 4 and 5 together.
+- Continue in the same pattern.
+
+Allow an alignment adjustment for PDFs with unusual front matter.
+
+Make the reader visually immersive, with a subtle center spine, page shadows, appropriate margins, and realistic transitions.
+
+Restore the last reading position when a book is reopened.
+
+Save progress periodically and on important lifecycle events. Do not lose progress if the app is interrupted.
+
+Do not promise text selection for scanned PDFs unless OCR is implemented.
+
+### DOWNLOADS
+
+Provide a complete offline download manager.
+
+States:
+
+- Not Downloaded.
+- Waiting.
+- Downloading.
+- Paused.
+- Failed.
+- Downloaded.
+
+Support:
+
+- Progress indicator.
+- Cancellation.
+- Retry.
+- Interrupted-download recovery.
+- Duplicate prevention.
+- File integrity verification.
+- Storage usage.
+- Delete downloaded copy.
+- Offline library.
+
+Downloaded PDFs must be stored in app-managed storage.
+
+Deleting a downloaded file must not delete its online source or personal reading history.
+
+### KNOWLEDGE MANAGEMENT
+
+Implement:
+
+- PDF text highlighting.
+- Multiple highlight colors.
+- Notes.
+- Notes attached to pages or highlights.
+- Bookmarks.
+- Custom bookmark names.
+- Important quotes.
+- Central Knowledge Hub.
+- Search across notes and saved content.
+
+Store stable page positions or PDF coordinates for annotations, not just page numbers.
+
+For scanned PDFs, clearly communicate limitations where text selection is unavailable.
+
+### SUMMARIES AND TEXT-TO-SPEECH
+
+Display catalog-provided:
+
+- Short summaries.
+- Detailed summaries.
+- Chapter-wise summaries where available.
+- Key takeaways.
+- Practical lessons.
+
+Implement device text-to-speech for summaries:
+
+- Play.
+- Pause.
+- Resume.
+- Speed adjustment where supported.
+
+Do not require a paid AI API or remote AI service for basic summary functionality.
+
+### READING GOALS AND NOTIFICATIONS
+
+On first launch allow users to configure:
+
+- Daily goal.
+- Reading days.
+- Reminder time.
+- Optional additional reminder.
+
+Implement local notifications for:
+
+- Daily reading.
+- Unfinished books.
+- Goal reminders.
+- Weekly reading reports.
+
+Include:
+
+- Quiet hours.
+- Skip today.
+- Pause notifications.
+- Vacation mode.
+- Notification preferences.
+
+Stop goal reminders once the goal is achieved. Prevent duplicate notifications and respect the configured schedule.
+
+Test notification behavior after device restart and application termination.
+
+### ANALYTICS
+
+Track:
+
+- Books started.
+- Books completed.
+- Currently reading.
+- Pages read.
+- Total reading time.
+- Average daily reading.
+- Current streak.
+- Longest streak.
+- Daily goal completion.
+- Weekly and monthly reading activity.
+- Category-wise reading.
+
+Include optional achievements.
+
+Only count genuine active reading sessions. Do not inflate reading time when the application is inactive.
+
+### PERSONALIZATION
+
+Generate recommendations locally using:
+
+- Reading history.
+- Favorites.
+- Categories.
+- Tags.
+- Completed books.
+- Saved books.
+- Authors.
+- User interests.
+
+Provide sections such as:
+
+- Recommended For You.
+- Similar Books.
+- More From This Author.
+- Because You Read...
+- Explore New Categories.
+
+### LOCAL DATA AND BACKUP
+
+Store all personal data locally.
+
+Provide:
+
+- Personal data export.
+- Notes and highlights export.
+- Backup creation.
+- Backup restore.
+- Optional full backup including downloaded PDFs.
+- Backup version validation.
+- Duplicate handling.
+
+Warn users that uninstalling the app or losing their device can result in data loss without a backup.
+
+### SETTINGS
+
+Include:
+
+- Light theme.
+- Dark theme.
+- System theme.
+- Reading preferences.
+- Default reading mode.
+- Notification settings.
+- Download management.
+- Storage usage.
+- Catalog refresh.
+- Backup and restore.
+- About Zentra.
+
+### DESIGN SYSTEM
+
+Build a premium, modern, polished interface.
+
+Use:
+
+- Elegant typography.
+- Beautiful cover artwork.
+- Consistent spacing.
+- Subtle shadows.
+- Refined rounded cards.
+- Smooth animations.
+- Clear loading skeletons.
+- Proper empty states.
+- Accessible touch targets.
+- Consistent icons.
+- High-quality dark and light themes.
+
+Avoid generic templates, clutter, excessive gradients, unnecessary decorative elements, and inconsistent layouts.
+
+The app must look like a professionally designed digital reading product.
+
+### DATA INTEGRITY
+
+Maintain clear separation between:
+
+1. Online catalog.
+2. Local personal database.
+3. Local downloaded and cached files.
+
+Catalog updates must never erase reading progress, notes, bookmarks, or history.
+
+Missing online books must not automatically delete local personal data.
+
+Use stable book and author IDs.
+
+Handle offline startup, failed requests, corrupt downloads, database migrations, low storage, and application interruptions.
+
+### IMPLEMENTATION PROCESS
+
+Build the project incrementally in the following order:
+
+1. Foundation, navigation, themes, and onboarding.
+2. Online JSON catalog and local caching.
+3. Home, Explore, Library, Book Details, and Author Profiles.
+4. PDF reader and reading progress.
+5. Download manager and offline reading.
+6. Highlights, Notes, Bookmarks, and Knowledge Hub.
+7. Reading goals and notifications.
+8. Analytics and recommendations.
+9. Backup and restore.
+10. Testing, optimization, and release preparation.
+
+Do not generate a superficial prototype with nonfunctional buttons.
+
+Every visible button and interaction must perform its intended function.
+
+Do not use mock data as a substitute for real catalog integration. Mock data may be used temporarily during development, but the real JSON endpoint must be integrated and tested.
+
+Do not silently omit difficult features. If a requested feature has a technical limitation, explain it and implement the closest reliable solution.
+
+Prioritize data integrity, a stable reader, offline functionality, and excellent user experience over unnecessary visual complexity.
+
+### ACCEPTANCE CRITERIA
+
+The project is complete only when:
+
+- The app loads the online book catalog.
+- Catalog caching and offline fallback work.
+- Book and author profiles display correct information.
+- Search and category discovery work.
+- Online PDFs open successfully.
+- PDFs can be downloaded and opened offline.
+- Reading progress is restored accurately.
+- Notes, highlights, and bookmarks persist.
+- Reading goals and local notifications work.
+- Analytics use actual reading activity.
+- Personal data survives application updates.
+- Backup and restore work.
+- All primary navigation and actions are functional.
+- The application has no mandatory login or backend dependency for personal reading data.
+- The app has been tested on real Android devices.
+
+**Final objective:** Deliver a polished, reliable, production-minded Android application called Zentra that makes discovering, reading, understanding, and remembering books a beautiful everyday experience.
+
+## **23. Important implementation notes before building**
+
+There are a few things worth getting right from the beginning:
+
+1\. **PDF hosting:** Your PDF links should point to stable, publicly accessible file URLs. The hosting provider should support large files and ideally HTTP range requests. Test the links directly before integrating them.
+
+2\. **Book images:** Use optimized JPG/WebP covers and author photographs. The app should load images progressively and cache them to avoid repeatedly downloading them.
+
+3\. **Catalog updates:** Keep book IDs permanent. Changing a book's ID later could disconnect its reading history and notes from the catalog.
+
+4\. **Content availability:** Ensure you have the necessary rights or permissions for the PDFs you host and distribute. Zentra's catalog and download functionality should only expose content you're authorized to make available.
+
+5\. **Google AI Studio:** Treat the project as a phased engineering task. A single giant generation request can produce attractive screens while leaving important functionality unfinished. Ask it to implement one phase at a time, run the app, verify the result, and then continue.
+
+## **24. My recommended first milestone**
+
+Don't begin with all 20 features at once.
+
+The first working milestone should be:
+
+**Zentra MVP**
+
+First release target
+
+- Premium Home screen.
+- Online JSON catalog integration.
+- Book discovery and categories.
+- Book details and author profiles.
+- Functional online PDF reader.
+- Download and offline reading.
+- Local reading progress.
+
+After this milestone is stable, add the Knowledge Hub, reminders, analytics, summaries, and recommendations.
+
+**One final product recommendation:** Keep the online catalog independent from the Android application. That way, you can add books, update author profiles, replace cover images, and improve summaries through your website without rebuilding or publishing a new Android app every time.
+
+That's the real advantage of Zentra's architecture: **one central library, many readers, and each reader's personal knowledge stays on their own device.** 📚
