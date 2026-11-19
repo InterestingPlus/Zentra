@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
   BookOpen,
   Check,
   Download,
+  ExternalLink,
   Heart,
   Pause,
   Play,
   Square,
   Trash2,
+  Upload,
   Volume2,
 } from 'lucide-react';
+import { getDriveDownloadUrl, isGoogleDrivePdf } from '../services/pdfService';
 import { summaryTts, type TtsState } from '../services/ttsService';
 import type {
   Author,
@@ -33,6 +37,7 @@ interface BookDetailViewProps {
   onBack: () => void;
   onReadNow: (bookId: string, page?: number) => void;
   onDownloadBook: (bookId: string) => void;
+  onImportOfflinePdf?: (bookId: string, file: File) => Promise<void>;
   onDeleteDownload: (bookId: string) => void;
   onToggleFavorite: (bookId: string) => void;
   onChangeStatus: (bookId: string, status: ReadingStatus) => void;
@@ -50,6 +55,7 @@ export const BookDetailView: React.FC<BookDetailViewProps> = ({
   onBack,
   onReadNow,
   onDownloadBook,
+  onImportOfflinePdf,
   onDeleteDownload,
   onToggleFavorite,
   onChangeStatus,
@@ -58,9 +64,13 @@ export const BookDetailView: React.FC<BookDetailViewProps> = ({
   onOpenAuthor,
 }) => {
   const [ttsState, setTtsState] = useState<TtsState>(summaryTts.getState());
+  const [importFeedback, setImportFeedback] = useState<string | null>(null);
+  const offlinePdfInputRef = useRef<HTMLInputElement>(null);
   const progress = db.progressByBook[book.id];
   const isFavorite = db.favorites.includes(book.id);
   const currentStatus: ReadingStatus = progress?.status ?? 'unread';
+  const isDrive = isGoogleDrivePdf(book);
+  const driveDownloadUrl = getDriveDownloadUrl(book);
 
   useEffect(() => {
     return summaryTts.subscribe(setTtsState);
@@ -186,10 +196,9 @@ export const BookDetailView: React.FC<BookDetailViewProps> = ({
               ? linkedAuthors
               : [{ id: book.authorId, name: authorName, photoUrl: author?.photoUrl ?? '' }]
             ).map((authItem) => (
-              <button
+              <Link
                 key={authItem.id}
-                type="button"
-                onClick={() => onOpenAuthor(authItem.id)}
+                to={`/author/${encodeURIComponent(authItem.id)}`}
                 className="inline-flex items-center gap-3 py-1.5 pr-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors text-left min-h-[44px]"
               >
                 <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
@@ -218,7 +227,7 @@ export const BookDetailView: React.FC<BookDetailViewProps> = ({
                     View author profile
                   </span>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
 
@@ -228,16 +237,15 @@ export const BookDetailView: React.FC<BookDetailViewProps> = ({
 
           {/* Primary Action Bar */}
           <div className="pt-2 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => onReadNow(book.id, progress?.currentPage ?? 1)}
+            <Link
+              to={`/read/${encodeURIComponent(book.id)}${progress && progress.currentPage > 1 ? `?page=${progress.currentPage}` : ''}`}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold min-h-[48px] whitespace-nowrap shrink-0"
             >
               <BookOpen className="w-4 h-4" />
               {progress && progress.currentPage > 1
                 ? `Resume Reading (Page ${progress.currentPage})`
                 : 'Read Now'}
-            </button>
+            </Link>
 
             {downloadRecord?.status === 'downloaded' ? (
               <div className="inline-flex items-center gap-1.5">
@@ -257,8 +265,54 @@ export const BookDetailView: React.FC<BookDetailViewProps> = ({
               </div>
             ) : downloadRecord?.status === 'downloading' ? (
               <span className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200 text-xs font-mono-tabular min-h-[48px]">
-                Downloading {downloadRecord.progress}%…
+                Saving {downloadRecord.progress}%…
               </span>
+            ) : isDrive && driveDownloadUrl ? (
+              <>
+                <a
+                  href={driveDownloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161B22] hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-800 dark:text-slate-100 min-h-[48px] whitespace-nowrap shrink-0"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PDF
+                  <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                </a>
+                {onImportOfflinePdf && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => offlinePdfInputRef.current?.click()}
+                      className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161B22] hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-800 dark:text-slate-100 min-h-[48px] whitespace-nowrap shrink-0"
+                    >
+                      <Upload className="w-4 h-4" />
+                      Save Offline PDF
+                    </button>
+                    <input
+                      ref={offlinePdfInputRef}
+                      type="file"
+                      accept="application/pdf,.pdf"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setImportFeedback(null);
+                        try {
+                          await onImportOfflinePdf(book.id, file);
+                          setImportFeedback('PDF saved to Zentra offline storage.');
+                        } catch (err) {
+                          setImportFeedback(
+                            err instanceof Error ? err.message : 'Unable to save PDF.'
+                          );
+                        } finally {
+                          e.target.value = '';
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </>
+                )}
+              </>
             ) : (
               <button
                 type="button"
@@ -284,6 +338,11 @@ export const BookDetailView: React.FC<BookDetailViewProps> = ({
               {isFavorite ? 'Favorited' : 'Favorite'}
             </button>
           </div>
+          {importFeedback && (
+            <p className="text-xs font-medium text-blue-700 dark:text-blue-400">
+              {importFeedback}
+            </p>
+          )}
 
           {/* Reading Status & Custom Lists */}
           <div className="pt-2 flex flex-wrap items-center gap-3">

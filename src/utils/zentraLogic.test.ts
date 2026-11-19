@@ -14,11 +14,19 @@ import {
 } from './readerLogic';
 import {
   computeReadingStats,
+  computeYearlyDashboardData,
+  getAvailableYears,
+  getYearlyGoalForYear,
   isWithinQuietHours,
   shouldTriggerReminder,
   toDateKey,
   validateAndMergeBackup,
 } from './analyticsLogic';
+import {
+  getDriveDownloadUrl,
+  getDrivePreviewUrl,
+  isGoogleDrivePdf,
+} from '../services/pdfService';
 import type { CatalogData, PersonalDatabase } from '../types/zentra';
 
 const sampleCatalogRaw = {
@@ -425,4 +433,119 @@ test('validateAndMergeBackup restores data safely without duplicates', () => {
   assert.equal(summary.notesAdded, 1);
   assert.equal(mergedDb.notes.length, 2);
   assert.deepEqual(mergedDb.favorites, ['b3']);
+});
+
+test('serverless Google Drive PDF helpers resolve direct embed and download URLs without backend proxy', () => {
+  const driveBook = {
+    id: 'who-moved-my-cheese',
+    title: 'Who Moved My Cheese?',
+    authorId: 'author_spencer_johnson',
+    coverUrl: '',
+    pdfUrl: 'https://drive.google.com/uc?export=download&id=169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg',
+    pdfFileId: '169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg',
+    pdfReaderUrl: 'https://drive.google.com/file/d/169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg/preview',
+    description: '',
+    summary: '',
+    keyTakeaways: [],
+    category: 'Self-Help',
+    language: 'English',
+    tags: [],
+  };
+
+  assert.equal(isGoogleDrivePdf(driveBook), true);
+  assert.equal(
+    getDrivePreviewUrl(driveBook),
+    'https://drive.google.com/file/d/169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg/preview'
+  );
+  assert.equal(
+    getDriveDownloadUrl(driveBook),
+    'https://drive.google.com/uc?export=download&id=169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg'
+  );
+  assert.equal(getDrivePreviewUrl(driveBook)?.includes('/api/'), false);
+
+  const nonDriveBook = {
+    ...driveBook,
+    id: 'local-study',
+    pdfUrl: 'zentra://local-study',
+    pdfFileId: undefined,
+    pdfReaderUrl: undefined,
+  };
+  assert.equal(isGoogleDrivePdf(nonDriveBook), false);
+  assert.equal(getDrivePreviewUrl(nonDriveBook), null);
+  assert.equal(getDriveDownloadUrl(nonDriveBook), null);
+});
+
+test('computeYearlyDashboardData aggregates monthly trends, cumulative pace, projections, and filters by year', () => {
+  const catalog = validateAndNormalizeCatalog(sampleCatalogRaw);
+  const now = new Date(2026, 5, 30, 12, 0, 0); // June 30, 2026 (~50% of year)
+
+  const sessions = [
+    // 2025 session should be ignored when computing 2026
+    { id: 'old1', bookId: 'b1', dateKey: '2025-11-10', startTime: 1, endTime: 2, durationSeconds: 3600, pagesRead: 90 },
+    // 2026 sessions
+    { id: 'y1', bookId: 'b1', dateKey: '2026-01-12', startTime: 1, endTime: 2, durationSeconds: 3600, pagesRead: 120 },
+    { id: 'y2', bookId: 'b1', dateKey: '2026-01-18', startTime: 3, endTime: 4, durationSeconds: 1800, pagesRead: 60 },
+    { id: 'y3', bookId: 'b2', dateKey: '2026-03-05', startTime: 5, endTime: 6, durationSeconds: 7200, pagesRead: 140 },
+    { id: 'y4', bookId: 'b3', dateKey: '2026-06-15', startTime: 7, endTime: 8, durationSeconds: 5400, pagesRead: 220 },
+  ];
+
+  const progressMap = {
+    b1: {
+      bookId: 'b1',
+      currentPage: 180,
+      totalPages: 180,
+      status: 'completed' as const,
+      lastReadAt: new Date(2026, 0, 18).getTime(),
+      completedAt: new Date(2026, 0, 18).getTime(),
+      totalSecondsRead: 5400,
+    },
+    b2: {
+      bookId: 'b2',
+      currentPage: 140,
+      totalPages: 140,
+      status: 'completed' as const,
+      lastReadAt: new Date(2026, 2, 5).getTime(),
+      completedAt: new Date(2026, 2, 5).getTime(),
+      totalSecondsRead: 7200,
+    },
+    b3: {
+      bookId: 'b3',
+      currentPage: 220,
+      totalPages: 220,
+      status: 'completed' as const,
+      lastReadAt: new Date(2026, 5, 15).getTime(),
+      completedAt: new Date(2026, 5, 15).getTime(),
+      totalSecondsRead: 5400,
+    },
+  };
+
+  const years = getAvailableYears(sessions, progressMap, undefined, now);
+  assert.deepEqual(years, [2026, 2025]);
+
+  const defaultGoal = getYearlyGoalForYear(undefined, 2026);
+  assert.equal(defaultGoal.targetBooks, 12);
+
+  const dashboard = computeYearlyDashboardData(
+    sessions,
+    progressMap,
+    catalog,
+    2026,
+    { year: 2026, targetBooks: 4, targetPages: 800, targetHours: 8 },
+    now
+  );
+
+  assert.equal(dashboard.booksCompleted, 3);
+  assert.equal(dashboard.pagesRead, 540);
+  assert.equal(dashboard.hoursRead, 5);
+  assert.equal(dashboard.activeDays, 4);
+  assert.equal(dashboard.monthlyTrend.length, 12);
+  assert.equal(dashboard.monthlyTrend[0].pages, 180);
+  assert.equal(dashboard.monthlyTrend[0].activeDays, 2);
+  assert.equal(dashboard.monthlyTrend[2].cumulativePages, 320);
+  assert.equal(dashboard.monthlyTrend[5].cumulativePages, 540);
+  assert.equal(dashboard.monthlyTrend[11].targetCumulativePages, 800);
+  assert.equal(dashboard.paceStatus, 'ahead');
+  assert.equal(dashboard.bestMonthLabel, 'Jun');
+  assert.equal(dashboard.categoryBreakdown.length, 2);
+  assert.equal(dashboard.categoryBreakdown[0].category, 'Productivity');
 });

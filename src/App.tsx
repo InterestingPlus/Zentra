@@ -1,4 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { AuthorProfileView } from './components/AuthorProfileView';
 import { BookDetailView } from './components/BookDetailView';
 import { DownloadsView } from './components/DownloadsView';
@@ -8,9 +18,9 @@ import { LibraryView } from './components/LibraryView';
 import { NavigationShell } from './components/NavigationShell';
 import { OnboardingWizard } from './components/OnboardingWizard';
 import { PdfReaderView } from './components/PdfReaderView';
+import { ReadingDashboardView } from './components/ReadingDashboardView';
 import { ReadingDeskView } from './components/ReadingDeskView';
 import { SettingsView } from './components/SettingsView';
-import { StatsView } from './components/StatsView';
 import { SEED_CATALOG } from './data/seedCatalog';
 import {
   fetchAndSyncCatalog,
@@ -31,10 +41,10 @@ import {
 import {
   computeSha256Hex,
   fetchOrSynthesizePdf,
+  importLocalPdfFile,
   verifyPdfMagicHeader,
 } from './services/pdfService';
 import type {
-  ActiveTab,
   AppSettings,
   CatalogData,
   DownloadRecord,
@@ -44,7 +54,7 @@ import type {
   PersonalDatabase,
   ReaderPreferences,
   ReadingStatus,
-  SubView,
+  YearlyReadingGoal,
 } from './types/zentra';
 import {
   computeReadingStats,
@@ -60,8 +70,327 @@ function makeId(prefix: string): string {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, [pathname]);
+  return null;
+}
+
+interface RouteNotFoundProps {
+  title: string;
+  description: string;
+}
+
+const RouteNotFound: React.FC<RouteNotFoundProps> = ({ title, description }) => (
+  <div className="p-10 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 text-center space-y-4 max-w-lg mx-auto my-8">
+    <h1 className="font-display text-2xl font-semibold text-slate-900 dark:text-white">
+      {title}
+    </h1>
+    <p className="text-sm text-slate-600 dark:text-slate-400">{description}</p>
+    <div className="flex justify-center gap-3">
+      <Link
+        to="/library"
+        className="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium min-h-[44px] inline-flex items-center"
+      >
+        Browse Library
+      </Link>
+      <Link
+        to="/"
+        className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium min-h-[44px] inline-flex items-center"
+      >
+        Home
+      </Link>
+    </div>
+  </div>
+);
+
+const RouteLoadingState: React.FC<{ label?: string }> = ({
+  label = 'Loading from catalog…',
+}) => (
+  <div className="p-12 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 text-center space-y-3 max-w-md mx-auto my-12">
+    <div
+      className="w-8 h-8 border-2 border-blue-700 border-t-transparent rounded-full animate-spin mx-auto"
+      aria-hidden="true"
+    />
+    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</p>
+  </div>
+);
+
+interface LibraryRouteProps {
+  catalog: CatalogData;
+  db: PersonalDatabase;
+  downloads: Record<string, DownloadRecord>;
+  onOpenBook: (bookId: string) => void;
+  onOpenAuthor: (authorId: string) => void;
+  onCreateCustomList: (name: string) => void;
+  onOpenDownloads: () => void;
+}
+
+const LibraryRoute: React.FC<LibraryRouteProps> = ({
+  catalog,
+  db,
+  downloads,
+  onOpenBook,
+  onOpenAuthor,
+  onCreateCustomList,
+  onOpenDownloads,
+}) => {
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get('category') || 'All';
+  const scopeParam = (searchParams.get('scope') as LibraryFilterScope) || 'all';
+  return (
+    <LibraryView
+      catalog={catalog}
+      db={db}
+      downloads={downloads}
+      initialCategory={categoryParam}
+      initialScope={scopeParam}
+      onOpenBook={onOpenBook}
+      onOpenAuthor={onOpenAuthor}
+      onCreateCustomList={onCreateCustomList}
+      onOpenDownloads={onOpenDownloads}
+    />
+  );
+};
+
+interface BookDetailRouteProps {
+  catalog: CatalogData;
+  db: PersonalDatabase;
+  downloads: Record<string, DownloadRecord>;
+  isSyncing: boolean;
+  onRecordRecentlyViewed: (bookId: string) => void;
+  onBack: () => void;
+  onReadNow: (bookId: string, page?: number) => void;
+  onDownloadBook: (bookId: string) => void;
+  onImportOfflinePdf: (bookId: string, file: File) => Promise<void>;
+  onDeleteDownload: (bookId: string) => void;
+  onToggleFavorite: (bookId: string) => void;
+  onChangeStatus: (bookId: string, status: ReadingStatus) => void;
+  onToggleCustomList: (listId: string, bookId: string) => void;
+  onOpenBook: (bookId: string) => void;
+  onOpenAuthor: (authorId: string) => void;
+}
+
+const BookDetailRoute: React.FC<BookDetailRouteProps> = ({
+  catalog,
+  db,
+  downloads,
+  isSyncing,
+  onRecordRecentlyViewed,
+  onBack,
+  onReadNow,
+  onDownloadBook,
+  onImportOfflinePdf,
+  onDeleteDownload,
+  onToggleFavorite,
+  onChangeStatus,
+  onToggleCustomList,
+  onOpenBook,
+  onOpenAuthor,
+}) => {
+  const { bookId } = useParams<{ bookId: string }>();
+  const decodedId = bookId ? decodeURIComponent(bookId) : '';
+  const book = catalog.books.find((b) => b.id === decodedId);
+
+  useEffect(() => {
+    if (book) {
+      onRecordRecentlyViewed(book.id);
+    }
+  }, [book?.id, onRecordRecentlyViewed]);
+
+  if (!book) {
+    if (isSyncing) {
+      return <RouteLoadingState label="Loading book details…" />;
+    }
+    return (
+      <RouteNotFound
+        title="Book not found"
+        description="This title may have been moved or is not present in the active catalog."
+      />
+    );
+  }
+
+  return (
+    <BookDetailView
+      book={book}
+      author={catalog.authors.find((a) => a.id === book.authorId)}
+      catalog={catalog}
+      db={db}
+      downloadRecord={downloads[book.id]}
+      onBack={onBack}
+      onReadNow={onReadNow}
+      onDownloadBook={onDownloadBook}
+      onImportOfflinePdf={onImportOfflinePdf}
+      onDeleteDownload={onDeleteDownload}
+      onToggleFavorite={onToggleFavorite}
+      onChangeStatus={onChangeStatus}
+      onToggleCustomList={onToggleCustomList}
+      onOpenBook={onOpenBook}
+      onOpenAuthor={onOpenAuthor}
+    />
+  );
+};
+
+interface AuthorProfileRouteProps {
+  catalog: CatalogData;
+  db: PersonalDatabase;
+  downloads: Record<string, DownloadRecord>;
+  isSyncing: boolean;
+  onBack: () => void;
+  onOpenBook: (bookId: string) => void;
+  onOpenAuthor: (authorId: string) => void;
+}
+
+const AuthorProfileRoute: React.FC<AuthorProfileRouteProps> = ({
+  catalog,
+  db,
+  downloads,
+  isSyncing,
+  onBack,
+  onOpenBook,
+  onOpenAuthor,
+}) => {
+  const { authorId } = useParams<{ authorId: string }>();
+  const decodedId = authorId ? decodeURIComponent(authorId) : '';
+  const author = catalog.authors.find((a) => a.id === decodedId);
+
+  if (!author) {
+    if (isSyncing) {
+      return <RouteLoadingState label="Loading author profile…" />;
+    }
+    return (
+      <RouteNotFound
+        title="Author not found"
+        description="We could not locate this author profile in the current catalog."
+      />
+    );
+  }
+
+  return (
+    <AuthorProfileView
+      author={author}
+      catalog={catalog}
+      db={db}
+      downloads={downloads}
+      onBack={onBack}
+      onOpenBook={onOpenBook}
+      onOpenAuthor={onOpenAuthor}
+    />
+  );
+};
+
+interface ReaderRouteProps {
+  catalog: CatalogData;
+  db: PersonalDatabase;
+  downloads: Record<string, DownloadRecord>;
+  isOnline: boolean;
+  isSyncing: boolean;
+  activeDownloadCount: number;
+  onCloseToBook: (bookId: string) => void;
+  onUpdatePreferences: (patch: Partial<ReaderPreferences>) => void;
+  onSaveProgress: (bookId: string, page: number, totalPages: number) => void;
+  onRecordSession: (
+    bookId: string,
+    durationSeconds: number,
+    pagesRead: number,
+    dateKey: string
+  ) => void;
+  onAddHighlight: (
+    bookId: string,
+    page: number,
+    text: string,
+    color: HighlightColor,
+    rects: HighlightRect[]
+  ) => Highlight;
+  onAddNote: (
+    bookId: string,
+    page: number,
+    title: string,
+    content: string,
+    highlightId?: string
+  ) => void;
+  onAddBookmark: (bookId: string, page: number, label: string) => void;
+  onDeleteHighlight: (id: string) => void;
+  onDeleteBookmark: (id: string) => void;
+  onDeleteNote: (id: string) => void;
+  onImportOfflinePdf: (bookId: string, file: File) => Promise<void>;
+}
+
+const ReaderRoute: React.FC<ReaderRouteProps> = ({
+  catalog,
+  db,
+  downloads,
+  isOnline,
+  isSyncing,
+  activeDownloadCount,
+  onCloseToBook,
+  onUpdatePreferences,
+  onSaveProgress,
+  onRecordSession,
+  onAddHighlight,
+  onAddNote,
+  onAddBookmark,
+  onDeleteHighlight,
+  onDeleteBookmark,
+  onDeleteNote,
+  onImportOfflinePdf,
+}) => {
+  const { bookId } = useParams<{ bookId: string }>();
+  const [searchParams] = useSearchParams();
+  const decodedId = bookId ? decodeURIComponent(bookId) : '';
+  const readerBook = catalog.books.find((b) => b.id === decodedId);
+
+  if (!readerBook) {
+    return (
+      <NavigationShell isOnline={isOnline} activeDownloadCount={activeDownloadCount}>
+        {isSyncing ? (
+          <RouteLoadingState label="Opening book reader…" />
+        ) : (
+          <RouteNotFound
+            title="Book not available"
+            description="We could not locate this PDF in your Zentra catalog."
+          />
+        )}
+      </NavigationShell>
+    );
+  }
+
+  const pageParam = Number(searchParams.get('page'));
+  const savedPage = db.progressByBook[readerBook.id]?.currentPage ?? 1;
+  const initialPage = Number.isFinite(pageParam) && pageParam >= 1 ? pageParam : savedPage;
+  const readerAuthor = catalog.authors.find((a) => a.id === readerBook.authorId);
+
+  return (
+    <PdfReaderView
+      book={readerBook}
+      author={readerAuthor}
+      initialPage={initialPage}
+      isOnline={isOnline}
+      isDownloaded={downloads[readerBook.id]?.status === 'downloaded'}
+      preferences={db.settings.reader}
+      highlights={db.highlights.filter((h) => h.bookId === readerBook.id)}
+      notes={db.notes.filter((n) => n.bookId === readerBook.id)}
+      bookmarks={db.bookmarks.filter((bm) => bm.bookId === readerBook.id)}
+      onClose={() => onCloseToBook(readerBook.id)}
+      onUpdatePreferences={onUpdatePreferences}
+      onSaveProgress={onSaveProgress}
+      onRecordSession={onRecordSession}
+      onAddHighlight={onAddHighlight}
+      onAddNote={onAddNote}
+      onAddBookmark={onAddBookmark}
+      onDeleteHighlight={onDeleteHighlight}
+      onDeleteBookmark={onDeleteBookmark}
+      onDeleteNote={onDeleteNote}
+      onImportOfflinePdf={onImportOfflinePdf}
+    />
+  );
+};
+
 export default function App() {
   const isOnline = useOnlineStatus();
+  const navigate = useNavigate();
 
   const [db, setDb] = useState<PersonalDatabase>(() => {
     const loaded = loadPersonalDb();
@@ -79,25 +408,13 @@ export default function App() {
     return cached?.catalog ?? validateAndNormalizeCatalog(SEED_CATALOG);
   });
 
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(true);
   const [syncStatusMessage, setSyncStatusMessage] = useState(
     'Loaded locally cached catalog.'
   );
   const [downloads, setDownloads] = useState<Record<string, DownloadRecord>>({});
   const downloadControllersRef = useRef<Map<string, AbortController>>(new Map());
-
-  // Navigation State
-  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
-  const [subViewStack, setSubViewStack] = useState<SubView[]>([]);
-  const [libraryFilterCategory, setLibraryFilterCategory] = useState<string>('All');
-  const [libraryFilterScope, setLibraryFilterScope] = useState<LibraryFilterScope>('all');
-  const [readerState, setReaderState] = useState<{ bookId: string; page: number } | null>(
-    null
-  );
   const [activeReminderBanner, setActiveReminderBanner] = useState<string | null>(null);
-
-  const currentSubView: SubView =
-    subViewStack.length > 0 ? subViewStack[subViewStack.length - 1] : { type: 'none' };
 
   // Persist personal database whenever it changes
   useEffect(() => {
@@ -185,43 +502,57 @@ export default function App() {
     return () => clearInterval(timer);
   }, [db.settings.reminders, db.lastSentReminders, stats.todayMinutesRead]);
 
-  // Navigation Helpers
-  const pushSubView = (view: SubView) => {
-    setSubViewStack((prev) => [...prev, view]);
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-  };
+  // Router Navigation Helpers
+  const recordRecentlyViewed = useCallback((bookId: string) => {
+    setDb((prev) => {
+      if (prev.recentlyViewed[0] === bookId) return prev;
+      return {
+        ...prev,
+        recentlyViewed: [
+          bookId,
+          ...prev.recentlyViewed.filter((id) => id !== bookId),
+        ].slice(0, 30),
+      };
+    });
+  }, []);
 
-  const popSubView = () => {
-    setSubViewStack((prev) => prev.slice(0, -1));
-  };
+  const openBookDetail = useCallback(
+    (bookId: string) => {
+      recordRecentlyViewed(bookId);
+      navigate(`/book/${encodeURIComponent(bookId)}`);
+    },
+    [navigate, recordRecentlyViewed]
+  );
 
-  const selectMainTab = (tab: ActiveTab) => {
-    setSubViewStack([]);
-    setActiveTab(tab);
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-  };
+  const openAuthorProfile = useCallback(
+    (authorId: string) => {
+      navigate(`/author/${encodeURIComponent(authorId)}`);
+    },
+    [navigate]
+  );
 
-  const openBookDetail = (bookId: string) => {
-    setDb((prev) => ({
-      ...prev,
-      recentlyViewed: [
-        bookId,
-        ...prev.recentlyViewed.filter((id) => id !== bookId),
-      ].slice(0, 30),
-    }));
-    pushSubView({ type: 'book_detail', bookId });
-  };
+  const openPdfReader = useCallback(
+    (bookId: string, page?: number) => {
+      const existingPage = db.progressByBook[bookId]?.currentPage ?? 1;
+      const targetPage = page ?? existingPage;
+      const suffix = targetPage > 1 ? `?page=${targetPage}` : '';
+      navigate(`/read/${encodeURIComponent(bookId)}${suffix}`);
+    },
+    [navigate, db.progressByBook]
+  );
 
-  const openAuthorProfile = (authorId: string) => {
-    pushSubView({ type: 'author_profile', authorId });
-  };
+  const navigateBackOrFallback = useCallback(
+    (fallbackPath = '/') => {
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate(fallbackPath);
+      }
+    },
+    [navigate]
+  );
 
-  const openPdfReader = (bookId: string, page?: number) => {
-    const existingPage = db.progressByBook[bookId]?.currentPage ?? 1;
-    setReaderState({ bookId, page: page ?? existingPage });
-  };
-
-  // Download Manager Actions
+  // Download Manager Actions (100% client-side, zero backend server)
   const handleStartDownload = async (bookId: string) => {
     const current = downloads[bookId];
     if (current?.status === 'downloading' || current?.status === 'downloaded') return;
@@ -299,6 +630,26 @@ export default function App() {
     }
   };
 
+  const handleImportOfflinePdf = useCallback(
+    async (bookId: string, file: File) => {
+      const buffer = await importLocalPdfFile(file);
+      const sha256 = await computeSha256Hex(buffer);
+      const completedRec: DownloadRecord = {
+        bookId,
+        status: 'downloaded',
+        progress: 100,
+        bytesDownloaded: buffer.byteLength,
+        totalBytes: buffer.byteLength,
+        sha256,
+        pdfUrl: `local://${file.name}`,
+        downloadedAt: Date.now(),
+      };
+      await saveDownloadedPdf(bookId, buffer, completedRec);
+      setDownloads((prev) => ({ ...prev, [bookId]: completedRec }));
+    },
+    []
+  );
+
   const handlePauseDownload = async (bookId: string) => {
     downloadControllersRef.current.get(bookId)?.abort();
     downloadControllersRef.current.delete(bookId);
@@ -343,6 +694,7 @@ export default function App() {
     setDb((prev) => {
       const existing = prev.progressByBook[bookId];
       const book = catalog.books.find((b) => b.id === bookId);
+      const now = Date.now();
       return {
         ...prev,
         progressByBook: {
@@ -352,7 +704,11 @@ export default function App() {
             currentPage: existing?.currentPage ?? 1,
             totalPages: existing?.totalPages ?? book?.pageCount ?? 10,
             status,
-            lastReadAt: Date.now(),
+            lastReadAt: now,
+            completedAt:
+              status === 'completed'
+                ? existing?.completedAt ?? now
+                : undefined,
             totalSecondsRead: existing?.totalSecondsRead ?? 0,
           },
         },
@@ -396,6 +752,7 @@ export default function App() {
             : existing?.status === 'completed'
               ? 'completed'
               : 'reading';
+        const now = Date.now();
 
         return {
           ...prev,
@@ -406,7 +763,11 @@ export default function App() {
               currentPage: page,
               totalPages,
               status: nextStatus,
-              lastReadAt: Date.now(),
+              lastReadAt: now,
+              completedAt:
+                nextStatus === 'completed'
+                  ? existing?.completedAt ?? now
+                  : existing?.completedAt,
               totalSecondsRead: existing?.totalSecondsRead ?? 0,
             },
           },
@@ -448,6 +809,81 @@ export default function App() {
       });
     },
     []
+  );
+
+  const handleUpdateYearlyGoal = useCallback((goal: YearlyReadingGoal) => {
+    setDb((prev) => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        reminders: {
+          ...prev.settings.reminders,
+          yearlyGoals: {
+            ...(prev.settings.reminders.yearlyGoals ?? {}),
+            [String(goal.year)]: goal,
+          },
+        },
+      },
+    }));
+  }, []);
+
+  const handleLogManualSession = useCallback(
+    (input: {
+      bookId: string;
+      durationMinutes: number;
+      pagesRead: number;
+      dateKey: string;
+      markCompleted: boolean;
+    }) => {
+      const durationSeconds = Math.max(60, Math.round(input.durationMinutes * 60));
+      const [yy, mm, dd] = input.dateKey.split('-').map(Number);
+      const sessionTimestamp = new Date(yy, (mm || 1) - 1, dd || 1, 18, 0, 0).getTime();
+
+      setDb((prev) => {
+        const book = catalog.books.find((b) => b.id === input.bookId);
+        const existing = prev.progressByBook[input.bookId];
+        const totalPages = existing?.totalPages ?? book?.pageCount ?? Math.max(10, input.pagesRead);
+        const nextPage = input.markCompleted
+          ? totalPages
+          : Math.min(totalPages, (existing?.currentPage ?? 0) + input.pagesRead);
+        const nextStatus: ReadingStatus = input.markCompleted
+          ? 'completed'
+          : existing?.status === 'completed'
+            ? 'completed'
+            : 'reading';
+
+        return {
+          ...prev,
+          sessions: [
+            ...prev.sessions,
+            {
+              id: makeId('sess'),
+              bookId: input.bookId,
+              dateKey: input.dateKey,
+              startTime: sessionTimestamp - durationSeconds * 1000,
+              endTime: sessionTimestamp,
+              durationSeconds,
+              pagesRead: Math.max(0, input.pagesRead),
+            },
+          ],
+          progressByBook: {
+            ...prev.progressByBook,
+            [input.bookId]: {
+              bookId: input.bookId,
+              currentPage: Math.max(1, nextPage),
+              totalPages,
+              status: nextStatus,
+              lastReadAt: Math.max(existing?.lastReadAt ?? 0, sessionTimestamp),
+              completedAt: input.markCompleted
+                ? sessionTimestamp
+                : existing?.completedAt,
+              totalSecondsRead: (existing?.totalSecondsRead ?? 0) + durationSeconds,
+            },
+          },
+        };
+      });
+    },
+    [catalog.books]
   );
 
   const handleAddHighlight = (
@@ -539,278 +975,285 @@ export default function App() {
     );
   }
 
-  // Fullscreen PDF Reader overlay if open
-  if (readerState) {
-    const readerBook = catalog.books.find((b) => b.id === readerState.bookId);
-    if (readerBook) {
-      const readerAuthor = catalog.authors.find(
-        (a) => a.id === readerBook.authorId
-      );
-      return (
-        <PdfReaderView
-          book={readerBook}
-          author={readerAuthor}
-          initialPage={readerState.page}
-          isOnline={isOnline}
-          isDownloaded={downloads[readerBook.id]?.status === 'downloaded'}
-          preferences={db.settings.reader}
-          highlights={db.highlights.filter((h) => h.bookId === readerBook.id)}
-          notes={db.notes.filter((n) => n.bookId === readerBook.id)}
-          bookmarks={db.bookmarks.filter((bm) => bm.bookId === readerBook.id)}
-          onClose={() => setReaderState(null)}
-          onUpdatePreferences={(patch: Partial<ReaderPreferences>) =>
-            setDb((prev) => ({
-              ...prev,
-              settings: {
-                ...prev.settings,
-                reader: { ...prev.settings.reader, ...patch },
-              },
-            }))
-          }
-          onSaveProgress={handleSaveProgress}
-          onRecordSession={handleRecordSession}
-          onAddHighlight={handleAddHighlight}
-          onAddNote={handleAddNote}
-          onAddBookmark={handleAddBookmark}
-          onDeleteHighlight={(id) =>
-            setDb((prev) => ({
-              ...prev,
-              highlights: prev.highlights.filter((h) => h.id !== id),
-            }))
-          }
-          onDeleteBookmark={(id) =>
-            setDb((prev) => ({
-              ...prev,
-              bookmarks: prev.bookmarks.filter((bm) => bm.id !== id),
-            }))
-          }
-          onDeleteNote={(id) =>
-            setDb((prev) => ({
-              ...prev,
-              notes: prev.notes.filter((n) => n.id !== id),
-            }))
-          }
-        />
-      );
-    }
-  }
-
   const activeDownloadCount = Object.values(downloads).filter(
     (d) => d.status === 'downloading'
   ).length;
 
-  const renderBody = () => {
-    if (currentSubView.type === 'book_detail') {
-      const book = catalog.books.find((b) => b.id === currentSubView.bookId);
-      if (book) {
-        return (
-          <BookDetailView
-            book={book}
-            author={catalog.authors.find((a) => a.id === book.authorId)}
-            catalog={catalog}
-            db={db}
-            downloadRecord={downloads[book.id]}
-            onBack={popSubView}
-            onReadNow={openPdfReader}
-            onDownloadBook={handleStartDownload}
-            onDeleteDownload={handleDeleteDownload}
-            onToggleFavorite={handleToggleFavorite}
-            onChangeStatus={handleChangeStatus}
-            onToggleCustomList={handleToggleCustomList}
-            onOpenBook={openBookDetail}
-            onOpenAuthor={openAuthorProfile}
-          />
-        );
-      }
-    }
-
-    if (currentSubView.type === 'author_profile') {
-      const author = catalog.authors.find(
-        (a) => a.id === currentSubView.authorId
-      );
-      if (author) {
-        return (
-          <AuthorProfileView
-            author={author}
-            catalog={catalog}
-            db={db}
-            downloads={downloads}
-            onBack={popSubView}
-            onOpenBook={openBookDetail}
-            onOpenAuthor={openAuthorProfile}
-          />
-        );
-      }
-    }
-
-    if (currentSubView.type === 'downloads') {
-      return (
-        <DownloadsView
-          catalog={catalog}
-          downloads={downloads}
-          onBack={popSubView}
-          onStartDownload={handleStartDownload}
-          onPauseDownload={handlePauseDownload}
-          onCancelDownload={handleCancelDownload}
-          onDeleteDownload={handleDeleteDownload}
-          onOpenReader={(id) => openPdfReader(id)}
-        />
-      );
-    }
-
-    if (currentSubView.type === 'settings') {
-      return (
-        <SettingsView
-          catalog={catalog}
-          db={db}
-          syncStatusMessage={syncStatusMessage}
-          onBack={popSubView}
-          onUpdateSettings={(updater: (prev: AppSettings) => AppSettings) =>
-            setDb((prev) => ({ ...prev, settings: updater(prev.settings) }))
-          }
-          onRefreshCatalog={handleRefreshCatalog}
-          onImportCustomCatalogJson={(jsonText) => {
-            try {
-              const parsed = JSON.parse(jsonText);
-              const normalized = validateAndNormalizeCatalog(parsed);
-              saveCatalogCache(normalized, 'local-file');
-              setCatalog(normalized);
-              setSyncStatusMessage(
-                `Loaded ${normalized.books.length} books from imported JSON catalog.`
-              );
-              return {
-                ok: true,
-                message: `Loaded ${normalized.books.length} books successfully.`,
-              };
-            } catch (err) {
-              return {
-                ok: false,
-                message:
-                  err instanceof Error ? err.message : 'Invalid catalog JSON file.',
-              };
-            }
-          }}
-          onRestoreMergedDb={(merged) => setDb(merged)}
-          onOpenDownloads={() => pushSubView({ type: 'downloads' })}
-          onReplayOnboarding={() => {
-            setSubViewStack([]);
-            setDb((prev) => ({
-              ...prev,
-              settings: { ...prev.settings, onboardingCompleted: false },
-            }));
-          }}
-        />
-      );
-    }
-
-    switch (activeTab) {
-      case 'home':
-        return (
-          <HomeView
-            catalog={catalog}
-            db={db}
-            stats={stats}
-            downloads={downloads}
-            isSyncing={isSyncing}
-            syncStatusMessage={syncStatusMessage}
-            activeReminderBanner={activeReminderBanner}
-            onDismissReminderBanner={() => setActiveReminderBanner(null)}
-            onRefreshCatalog={() => handleRefreshCatalog()}
-            onOpenBook={openBookDetail}
-            onReadBook={openPdfReader}
-            onOpenAuthor={openAuthorProfile}
-            onExploreAll={(cat) => {
-              setLibraryFilterCategory(cat ?? 'All');
-              setLibraryFilterScope('all');
-              selectMainTab('library');
-            }}
-            onDismissRecommendation={(bookId) =>
-              setDb((prev) => ({
-                ...prev,
-                notInterestedIds: [...prev.notInterestedIds, bookId],
-              }))
-            }
-          />
-        );
-      case 'library':
-        return (
-          <LibraryView
-            catalog={catalog}
-            db={db}
-            downloads={downloads}
-            initialCategory={libraryFilterCategory}
-            initialScope={libraryFilterScope}
-            onOpenBook={openBookDetail}
-            onOpenAuthor={openAuthorProfile}
-            onCreateCustomList={handleCreateCustomList}
-            onOpenDownloads={() => pushSubView({ type: 'downloads' })}
-          />
-        );
-      case 'reading':
-        return (
-          <ReadingDeskView
-            catalog={catalog}
-            db={db}
-            downloads={downloads}
-            onReadBook={openPdfReader}
-            onOpenBook={openBookDetail}
-            onExploreLibrary={() => selectMainTab('library')}
-          />
-        );
-      case 'knowledge':
-        return (
-          <KnowledgeHubView
-            catalog={catalog}
-            db={db}
-            onOpenReader={openPdfReader}
-            onOpenBook={openBookDetail}
-            onDeleteHighlight={(id) =>
-              setDb((prev) => ({
-                ...prev,
-                highlights: prev.highlights.filter((h) => h.id !== id),
-              }))
-            }
-            onDeleteNote={(id) =>
-              setDb((prev) => ({
-                ...prev,
-                notes: prev.notes.filter((n) => n.id !== id),
-              }))
-            }
-            onUpdateNote={handleUpdateNote}
-            onDeleteBookmark={(id) =>
-              setDb((prev) => ({
-                ...prev,
-                bookmarks: prev.bookmarks.filter((bm) => bm.id !== id),
-              }))
-            }
-          />
-        );
-      case 'stats':
-        return (
-          <StatsView
-            stats={stats}
-            onOpenReminders={() => pushSubView({ type: 'settings' })}
-          />
-        );
-    }
-  };
-
   return (
-    <NavigationShell
-      activeTab={activeTab}
-      subView={currentSubView}
-      isOnline={isOnline}
-      activeDownloadCount={activeDownloadCount}
-      onSelectTab={selectMainTab}
-      onOpenSearch={() => {
-        setLibraryFilterCategory('All');
-        setLibraryFilterScope('all');
-        selectMainTab('library');
-      }}
-      onOpenDownloads={() => pushSubView({ type: 'downloads' })}
-      onOpenSettings={() => pushSubView({ type: 'settings' })}
-    >
-      {renderBody()}
-    </NavigationShell>
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Dedicated full-page reader route */}
+        <Route
+          path="/read/:bookId"
+          element={
+            <ReaderRoute
+              catalog={catalog}
+              db={db}
+              downloads={downloads}
+              isOnline={isOnline}
+              isSyncing={isSyncing}
+              activeDownloadCount={activeDownloadCount}
+              onCloseToBook={(id) => navigate(`/book/${encodeURIComponent(id)}`)}
+              onUpdatePreferences={(patch: Partial<ReaderPreferences>) =>
+                setDb((prev) => ({
+                  ...prev,
+                  settings: {
+                    ...prev.settings,
+                    reader: { ...prev.settings.reader, ...patch },
+                  },
+                }))
+              }
+              onSaveProgress={handleSaveProgress}
+              onRecordSession={handleRecordSession}
+              onAddHighlight={handleAddHighlight}
+              onAddNote={handleAddNote}
+              onAddBookmark={handleAddBookmark}
+              onDeleteHighlight={(id) =>
+                setDb((prev) => ({
+                  ...prev,
+                  highlights: prev.highlights.filter((h) => h.id !== id),
+                }))
+              }
+              onDeleteBookmark={(id) =>
+                setDb((prev) => ({
+                  ...prev,
+                  bookmarks: prev.bookmarks.filter((bm) => bm.id !== id),
+                }))
+              }
+              onDeleteNote={(id) =>
+                setDb((prev) => ({
+                  ...prev,
+                  notes: prev.notes.filter((n) => n.id !== id),
+                }))
+              }
+              onImportOfflinePdf={handleImportOfflinePdf}
+            />
+          }
+        />
+
+        {/* Main navigation shell routes */}
+        <Route
+          element={
+            <NavigationShell
+              isOnline={isOnline}
+              activeDownloadCount={activeDownloadCount}
+            />
+          }
+        >
+          <Route
+            path="/"
+            element={
+              <HomeView
+                catalog={catalog}
+                db={db}
+                stats={stats}
+                downloads={downloads}
+                isSyncing={isSyncing}
+                syncStatusMessage={syncStatusMessage}
+                activeReminderBanner={activeReminderBanner}
+                onDismissReminderBanner={() => setActiveReminderBanner(null)}
+                onRefreshCatalog={() => handleRefreshCatalog()}
+                onOpenBook={openBookDetail}
+                onReadBook={openPdfReader}
+                onOpenAuthor={openAuthorProfile}
+                onExploreAll={(cat) => {
+                  const query = cat
+                    ? `?category=${encodeURIComponent(cat)}`
+                    : '';
+                  navigate(`/library${query}`);
+                }}
+                onDismissRecommendation={(bookId) =>
+                  setDb((prev) => ({
+                    ...prev,
+                    notInterestedIds: [...prev.notInterestedIds, bookId],
+                  }))
+                }
+              />
+            }
+          />
+          <Route
+            path="/library"
+            element={
+              <LibraryRoute
+                catalog={catalog}
+                db={db}
+                downloads={downloads}
+                onOpenBook={openBookDetail}
+                onOpenAuthor={openAuthorProfile}
+                onCreateCustomList={handleCreateCustomList}
+                onOpenDownloads={() => navigate('/downloads')}
+              />
+            }
+          />
+          <Route
+            path="/reading"
+            element={
+              <ReadingDeskView
+                catalog={catalog}
+                db={db}
+                downloads={downloads}
+                onReadBook={openPdfReader}
+                onOpenBook={openBookDetail}
+                onExploreLibrary={() => navigate('/library')}
+              />
+            }
+          />
+          <Route
+            path="/knowledge"
+            element={
+              <KnowledgeHubView
+                catalog={catalog}
+                db={db}
+                onOpenReader={openPdfReader}
+                onOpenBook={openBookDetail}
+                onDeleteHighlight={(id) =>
+                  setDb((prev) => ({
+                    ...prev,
+                    highlights: prev.highlights.filter((h) => h.id !== id),
+                  }))
+                }
+                onDeleteNote={(id) =>
+                  setDb((prev) => ({
+                    ...prev,
+                    notes: prev.notes.filter((n) => n.id !== id),
+                  }))
+                }
+                onUpdateNote={handleUpdateNote}
+                onDeleteBookmark={(id) =>
+                  setDb((prev) => ({
+                    ...prev,
+                    bookmarks: prev.bookmarks.filter((bm) => bm.id !== id),
+                  }))
+                }
+              />
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <ReadingDashboardView
+                catalog={catalog}
+                db={db}
+                stats={stats}
+                onUpdateYearlyGoal={handleUpdateYearlyGoal}
+                onLogManualSession={handleLogManualSession}
+                onOpenReminders={() => navigate('/settings')}
+              />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ReadingDashboardView
+                catalog={catalog}
+                db={db}
+                stats={stats}
+                onUpdateYearlyGoal={handleUpdateYearlyGoal}
+                onLogManualSession={handleLogManualSession}
+                onOpenReminders={() => navigate('/settings')}
+              />
+            }
+          />
+          <Route
+            path="/book/:bookId"
+            element={
+              <BookDetailRoute
+                catalog={catalog}
+                db={db}
+                downloads={downloads}
+                isSyncing={isSyncing}
+                onRecordRecentlyViewed={recordRecentlyViewed}
+                onBack={() => navigateBackOrFallback('/library')}
+                onReadNow={openPdfReader}
+                onDownloadBook={handleStartDownload}
+                onImportOfflinePdf={handleImportOfflinePdf}
+                onDeleteDownload={handleDeleteDownload}
+                onToggleFavorite={handleToggleFavorite}
+                onChangeStatus={handleChangeStatus}
+                onToggleCustomList={handleToggleCustomList}
+                onOpenBook={openBookDetail}
+                onOpenAuthor={openAuthorProfile}
+              />
+            }
+          />
+          <Route
+            path="/author/:authorId"
+            element={
+              <AuthorProfileRoute
+                catalog={catalog}
+                db={db}
+                downloads={downloads}
+                isSyncing={isSyncing}
+                onBack={() => navigateBackOrFallback('/library')}
+                onOpenBook={openBookDetail}
+                onOpenAuthor={openAuthorProfile}
+              />
+            }
+          />
+          <Route
+            path="/downloads"
+            element={
+              <DownloadsView
+                catalog={catalog}
+                downloads={downloads}
+                onBack={() => navigateBackOrFallback('/library')}
+                onStartDownload={handleStartDownload}
+                onPauseDownload={handlePauseDownload}
+                onCancelDownload={handleCancelDownload}
+                onDeleteDownload={handleDeleteDownload}
+                onOpenReader={(id) => openPdfReader(id)}
+              />
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <SettingsView
+                catalog={catalog}
+                db={db}
+                syncStatusMessage={syncStatusMessage}
+                onBack={() => navigateBackOrFallback('/')}
+                onUpdateSettings={(updater: (prev: AppSettings) => AppSettings) =>
+                  setDb((prev) => ({ ...prev, settings: updater(prev.settings) }))
+                }
+                onRefreshCatalog={handleRefreshCatalog}
+                onImportCustomCatalogJson={(jsonText) => {
+                  try {
+                    const parsed = JSON.parse(jsonText);
+                    const normalized = validateAndNormalizeCatalog(parsed);
+                    saveCatalogCache(normalized, 'local-file');
+                    setCatalog(normalized);
+                    setSyncStatusMessage(
+                      `Loaded ${normalized.books.length} books from imported JSON catalog.`
+                    );
+                    return {
+                      ok: true,
+                      message: `Loaded ${normalized.books.length} books successfully.`,
+                    };
+                  } catch (err) {
+                    return {
+                      ok: false,
+                      message:
+                        err instanceof Error ? err.message : 'Invalid catalog JSON file.',
+                    };
+                  }
+                }}
+                onRestoreMergedDb={(merged) => setDb(merged)}
+                onOpenDownloads={() => navigate('/downloads')}
+                onReplayOnboarding={() => {
+                  navigate('/');
+                  setDb((prev) => ({
+                    ...prev,
+                    settings: { ...prev.settings, onboardingCompleted: false },
+                  }));
+                }}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </>
   );
 }

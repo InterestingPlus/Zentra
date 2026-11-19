@@ -43,6 +43,14 @@ export function createDefaultSettings(): AppSettings {
       quietHoursEnd: '07:00',
       paused: false,
       vacationMode: false,
+      yearlyGoals: {
+        [String(new Date().getFullYear())]: {
+          year: new Date().getFullYear(),
+          targetBooks: 12,
+          targetPages: 3000,
+          targetHours: 120,
+        },
+      },
     },
   };
 }
@@ -109,6 +117,10 @@ export function loadPersonalDb(): PersonalDatabase {
         reminders: {
           ...defaults.settings.reminders,
           ...(parsed.settings?.reminders ?? {}),
+          yearlyGoals: {
+            ...(defaults.settings.reminders.yearlyGoals ?? {}),
+            ...(parsed.settings?.reminders?.yearlyGoals ?? {}),
+          },
         },
       },
     };

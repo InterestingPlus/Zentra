@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   BookOpen,
@@ -114,13 +115,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <h2 className="font-display text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white">
             {title}
           </h2>
-          <button
-            type="button"
-            onClick={() => onExploreAll()}
+          <Link
+            to="/library"
             className="text-xs font-medium text-blue-700 dark:text-blue-400 hover:underline whitespace-nowrap shrink-0 py-1"
           >
             Explore all
-          </button>
+          </Link>
         </div>
 
         <div className="flex gap-4 overflow-x-auto shelf-scroll pb-2">
@@ -187,7 +187,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-          <div className="flex items-center gap-2.5 bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2">
+          <Link
+            to="/stats"
+            className="flex items-center gap-2.5 bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600 transition-colors rounded-xl px-3.5 py-2"
+          >
             <Target className="w-4 h-4 text-blue-700 dark:text-blue-400 shrink-0" />
             <div className="text-xs">
               <span className="text-slate-500 dark:text-slate-400 block">Daily goal</span>
@@ -195,9 +198,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 {stats.todayMinutesRead} / {stats.dailyGoalMinutes}m ({goalPct}%)
               </span>
             </div>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-2.5 bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2">
+          <Link
+            to="/stats"
+            className="flex items-center gap-2.5 bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600 transition-colors rounded-xl px-3.5 py-2"
+          >
             <Flame className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <div className="text-xs">
               <span className="text-slate-500 dark:text-slate-400 block">Streak</span>
@@ -205,7 +211,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 {stats.currentStreakDays} {stats.currentStreakDays === 1 ? 'day' : 'days'}
               </span>
             </div>
-          </div>
+          </Link>
 
           <button
             type="button"
@@ -243,13 +249,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <h2 className="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white">
                 {continuePrimary.book.title}
               </h2>
-              <button
-                type="button"
-                onClick={() => onOpenAuthor(continuePrimary.book.authorId)}
-                className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mt-0.5"
+              <Link
+                to={`/author/${encodeURIComponent(continuePrimary.book.authorId)}`}
+                className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mt-0.5 inline-block"
               >
                 {getAuthorName(continuePrimary.book, catalog.authors)}
-              </button>
+              </Link>
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-mono-tabular">
               <span>
@@ -267,23 +272,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </span>
             </div>
             <div className="pt-1 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={() =>
-                  onReadBook(continuePrimary.book.id, continuePrimary.progress.currentPage)
-                }
+              <Link
+                to={`/read/${encodeURIComponent(continuePrimary.book.id)}${
+                  continuePrimary.progress.currentPage > 1
+                    ? `?page=${continuePrimary.progress.currentPage}`
+                    : ''
+                }`}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium min-h-[44px] whitespace-nowrap shrink-0"
               >
                 <BookOpen className="w-4 h-4" />
                 Resume Page {continuePrimary.progress.currentPage}
-              </button>
-              <button
-                type="button"
-                onClick={() => onOpenBook(continuePrimary.book.id)}
+              </Link>
+              <Link
+                to={`/book/${encodeURIComponent(continuePrimary.book.id)}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 min-h-[44px] whitespace-nowrap shrink-0"
               >
                 Book details
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -311,23 +316,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </p>
             <div className="pt-1 flex flex-wrap gap-3">
               {featuredBooks[0] && (
-                <button
-                  type="button"
-                  onClick={() => onReadBook(featuredBooks[0].id, 1)}
+                <Link
+                  to={`/read/${encodeURIComponent(featuredBooks[0].id)}`}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-slate-900 hover:bg-slate-100 text-sm font-semibold min-h-[44px] whitespace-nowrap shrink-0"
                 >
                   <BookOpen className="w-4 h-4" />
                   Start Reading
-                </button>
+                </Link>
               )}
-              <button
-                type="button"
-                onClick={() => onExploreAll()}
+              <Link
+                to="/library"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-xs text-white text-sm font-medium min-h-[44px] whitespace-nowrap shrink-0"
               >
                 <Compass className="w-4 h-4" />
                 Browse Catalog
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -354,10 +357,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         <div className="flex gap-4 overflow-x-auto shelf-scroll pb-2">
           {discoverAuthors.map((author: Author) => (
-            <button
+            <Link
               key={author.id}
-              type="button"
-              onClick={() => onOpenAuthor(author.id)}
+              to={`/author/${encodeURIComponent(author.id)}`}
               className="group w-32 sm:w-36 shrink-0 flex flex-col items-center text-center p-3 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/80 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600 transition-colors"
             >
               <div className="w-20 h-20 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center shrink-0">
@@ -384,7 +386,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono-tabular mt-0.5">
                 {author.bookIds.length} {author.bookIds.length === 1 ? 'book' : 'books'}
               </span>
-            </button>
+            </Link>
           ))}
         </div>
       </section>
@@ -407,14 +409,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
             {catalog.categories.length} catalog categories · {catalog.books.length} books available
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => onExploreAll()}
+        <Link
+          to="/library"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium min-h-[44px] whitespace-nowrap shrink-0 w-fit"
         >
           <span>Explore All Books</span>
           <ArrowRight className="w-4 h-4" />
-        </button>
+        </Link>
       </section>
     </div>
   );

@@ -4,6 +4,7 @@ import type {
   PersonalDatabase,
   ReadingProgress,
   ReadingSession,
+  YearlyReadingGoal,
   ZentraBackupPayload,
 } from '../types/zentra';
 
@@ -45,6 +46,65 @@ export interface ReadingStatsSummary {
   monthlyActivity: DailyActivityPoint[];
   categoryDistribution: CategoryDistributionItem[];
   achievements: AchievementBadge[];
+}
+
+export interface MonthlyTrendPoint {
+  monthIndex: number; // 0..11
+  monthKey: string; // YYYY-MM
+  monthLabel: string; // Jan..Dec
+  minutes: number;
+  hours: number;
+  pages: number;
+  booksCompleted: number;
+  sessionsCount: number;
+  activeDays: number;
+  cumulativePages: number;
+  cumulativeHours: number;
+  cumulativeBooks: number;
+  targetCumulativePages: number;
+  targetCumulativeHours: number;
+  targetCumulativeBooks: number;
+}
+
+export type YearlyPaceStatus = 'ahead' | 'on_track' | 'behind';
+
+export interface YearlyCategoryStat {
+  category: string;
+  minutes: number;
+  hours: number;
+  pages: number;
+  booksCount: number;
+}
+
+export interface YearlyDashboardData {
+  year: number;
+  goal: YearlyReadingGoal;
+  booksCompleted: number;
+  pagesRead: number;
+  minutesRead: number;
+  hoursRead: number;
+  sessionsCount: number;
+  activeDays: number;
+  booksPct: number;
+  pagesPct: number;
+  hoursPct: number;
+  yearElapsedPct: number;
+  expectedBooksByNow: number;
+  expectedPagesByNow: number;
+  expectedHoursByNow: number;
+  paceStatus: YearlyPaceStatus;
+  paceDeltaBooks: number;
+  projectedBooksYearEnd: number;
+  projectedPagesYearEnd: number;
+  projectedHoursYearEnd: number;
+  daysRemainingInYear: number;
+  monthlyTargetPages: number;
+  monthlyTargetHours: number;
+  monthlyTargetBooks: number;
+  bestMonthLabel: string | null;
+  bestMonthPages: number;
+  monthlyTrend: MonthlyTrendPoint[];
+  categoryBreakdown: YearlyCategoryStat[];
 }
 
 export function toDateKey(date: Date): string {
@@ -273,6 +333,308 @@ export function computeReadingStats(
     monthlyActivity,
     categoryDistribution,
     achievements,
+  };
+}
+
+const MONTH_SHORT_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+export function getYearlyGoalForYear(
+  yearlyGoals: Record<string, YearlyReadingGoal> | undefined,
+  year: number
+): YearlyReadingGoal {
+  const saved = yearlyGoals?.[String(year)];
+  if (saved) {
+    return {
+      year,
+      targetBooks: Math.max(1, Math.round(saved.targetBooks || 12)),
+      targetPages: Math.max(50, Math.round(saved.targetPages || 3000)),
+      targetHours: Math.max(1, Math.round(saved.targetHours || 120)),
+    };
+  }
+  return {
+    year,
+    targetBooks: 12,
+    targetPages: 3000,
+    targetHours: 120,
+  };
+}
+
+export function getAvailableYears(
+  sessions: ReadingSession[],
+  progressMap: Record<string, ReadingProgress>,
+  yearlyGoals?: Record<string, YearlyReadingGoal>,
+  now = new Date()
+): number[] {
+  const years = new Set<number>([now.getFullYear()]);
+  for (const s of sessions) {
+    const parsedYear = Number(s.dateKey.slice(0, 4));
+    if (Number.isInteger(parsedYear) && parsedYear >= 2000 && parsedYear <= 2100) {
+      years.add(parsedYear);
+    }
+  }
+  for (const p of Object.values(progressMap)) {
+    const ts = p.completedAt ?? p.lastReadAt;
+    if (ts > 0) {
+      const y = new Date(ts).getFullYear();
+      if (y >= 2000 && y <= 2100) years.add(y);
+    }
+  }
+  if (yearlyGoals) {
+    for (const key of Object.keys(yearlyGoals)) {
+      const y = Number(key);
+      if (Number.isInteger(y) && y >= 2000 && y <= 2100) years.add(y);
+    }
+  }
+  return Array.from(years).sort((a, b) => b - a);
+}
+
+export function computeYearlyDashboardData(
+  sessions: ReadingSession[],
+  progressMap: Record<string, ReadingProgress>,
+  catalog: CatalogData,
+  year: number,
+  goalInput: YearlyReadingGoal,
+  now = new Date()
+): YearlyDashboardData {
+  const goal: YearlyReadingGoal = {
+    year,
+    targetBooks: Math.max(1, Math.round(goalInput.targetBooks)),
+    targetPages: Math.max(50, Math.round(goalInput.targetPages)),
+    targetHours: Math.max(1, Math.round(goalInput.targetHours)),
+  };
+
+  const monthBuckets = Array.from({ length: 12 }, (_, idx) => ({
+    minutes: 0,
+    pages: 0,
+    booksCompleted: 0,
+    sessionsCount: 0,
+    activeDayKeys: new Set<string>(),
+  }));
+
+  const yearPrefix = `${year}-`;
+  const activeYearDayKeys = new Set<string>();
+  const categoryMap = new Map<
+    string,
+    { minutes: number; pages: number; books: Set<string> }
+  >();
+  const bookLookup = new Map(catalog.books.map((b) => [b.id, b]));
+
+  let totalMinutes = 0;
+  let totalSessionPages = 0;
+  let totalSessionsCount = 0;
+
+  for (const s of sessions) {
+    if (s.durationSeconds <= 0 || !s.dateKey.startsWith(yearPrefix)) continue;
+    const monthNum = Number(s.dateKey.slice(5, 7));
+    if (!Number.isInteger(monthNum) || monthNum < 1 || monthNum > 12) continue;
+
+    const bucket = monthBuckets[monthNum - 1];
+    const mins = s.durationSeconds / 60;
+    const pages = Math.max(0, s.pagesRead);
+    bucket.minutes += mins;
+    bucket.pages += pages;
+    bucket.sessionsCount += 1;
+    bucket.activeDayKeys.add(s.dateKey);
+
+    totalMinutes += mins;
+    totalSessionPages += pages;
+    totalSessionsCount += 1;
+    activeYearDayKeys.add(s.dateKey);
+
+    const book = bookLookup.get(s.bookId);
+    const cat = book?.category ?? 'General Reading';
+    const entry = categoryMap.get(cat) ?? { minutes: 0, pages: 0, books: new Set<string>() };
+    entry.minutes += mins;
+    entry.pages += pages;
+    entry.books.add(s.bookId);
+    categoryMap.set(cat, entry);
+  }
+
+  let booksCompleted = 0;
+  let progressPagesInYear = 0;
+
+  for (const p of Object.values(progressMap)) {
+    if (p.status === 'unread') continue;
+    const ts = p.status === 'completed' ? (p.completedAt ?? p.lastReadAt) : p.lastReadAt;
+    if (!ts) continue;
+    const dt = new Date(ts);
+    if (dt.getFullYear() !== year) continue;
+
+    const monthIdx = dt.getMonth();
+    if (p.status === 'completed') {
+      booksCompleted += 1;
+      monthBuckets[monthIdx].booksCompleted += 1;
+    }
+    progressPagesInYear += Math.max(0, p.currentPage);
+
+    const book = bookLookup.get(p.bookId);
+    const cat = book?.category ?? 'General Reading';
+    const entry = categoryMap.get(cat) ?? { minutes: 0, pages: 0, books: new Set<string>() };
+    entry.books.add(p.bookId);
+    categoryMap.set(cat, entry);
+  }
+
+  const pagesRead = Math.max(Math.round(totalSessionPages), progressPagesInYear);
+  const minutesRead = Math.round(totalMinutes);
+  const hoursRead = Math.round((minutesRead / 60) * 10) / 10;
+
+  // Build Jan..Dec cumulative and monthly points
+  const monthlyTrend: MonthlyTrendPoint[] = [];
+  let cumPages = 0;
+  let cumMinutes = 0;
+  let cumBooks = 0;
+  let bestMonthLabel: string | null = null;
+  let bestMonthPages = 0;
+  let bestMonthScore = 0;
+
+  for (let i = 0; i < 12; i++) {
+    const b = monthBuckets[i];
+    const mMinutes = Math.round(b.minutes);
+    const mHours = Math.round((b.minutes / 60) * 10) / 10;
+    const mPages = Math.round(b.pages);
+    cumPages += mPages;
+    cumMinutes += b.minutes;
+    cumBooks += b.booksCompleted;
+
+    const monthScore = mPages + mMinutes + b.booksCompleted * 100;
+    if (monthScore > bestMonthScore) {
+      bestMonthScore = monthScore;
+      bestMonthLabel = MONTH_SHORT_LABELS[i];
+      bestMonthPages = mPages;
+    }
+
+    const fraction = (i + 1) / 12;
+    monthlyTrend.push({
+      monthIndex: i,
+      monthKey: `${year}-${String(i + 1).padStart(2, '0')}`,
+      monthLabel: MONTH_SHORT_LABELS[i],
+      minutes: mMinutes,
+      hours: mHours,
+      pages: mPages,
+      booksCompleted: b.booksCompleted,
+      sessionsCount: b.sessionsCount,
+      activeDays: b.activeDayKeys.size,
+      cumulativePages: cumPages,
+      cumulativeHours: Math.round((cumMinutes / 60) * 10) / 10,
+      cumulativeBooks: cumBooks,
+      targetCumulativePages: Math.round(goal.targetPages * fraction),
+      targetCumulativeHours: Math.round(goal.targetHours * fraction * 10) / 10,
+      targetCumulativeBooks: Math.round(goal.targetBooks * fraction * 10) / 10,
+    });
+  }
+
+  // Year elapsed fraction & pace projection
+  const startOfYear = new Date(year, 0, 1).getTime();
+  const endOfYear = new Date(year + 1, 0, 1).getTime();
+  const totalYearDays = Math.round((endOfYear - startOfYear) / (24 * 3600 * 1000));
+  let elapsedRatio: number;
+  let daysRemainingInYear: number;
+
+  if (year < now.getFullYear()) {
+    elapsedRatio = 1;
+    daysRemainingInYear = 0;
+  } else if (year > now.getFullYear()) {
+    elapsedRatio = 0;
+    daysRemainingInYear = totalYearDays;
+  } else {
+    const dayOfYear = Math.max(
+      1,
+      Math.floor((now.getTime() - startOfYear) / (24 * 3600 * 1000)) + 1
+    );
+    elapsedRatio = Math.min(1, dayOfYear / totalYearDays);
+    daysRemainingInYear = Math.max(0, totalYearDays - dayOfYear);
+  }
+
+  const yearElapsedPct = Math.round(elapsedRatio * 100);
+  const expectedBooksByNow = Math.round(goal.targetBooks * elapsedRatio * 10) / 10;
+  const expectedPagesByNow = Math.round(goal.targetPages * elapsedRatio);
+  const expectedHoursByNow = Math.round(goal.targetHours * elapsedRatio * 10) / 10;
+
+  const booksPct = Math.min(100, Math.round((booksCompleted / goal.targetBooks) * 100));
+  const pagesPct = Math.min(100, Math.round((pagesRead / goal.targetPages) * 100));
+  const hoursPct = Math.min(100, Math.round((hoursRead / goal.targetHours) * 100));
+
+  // Combined pace evaluation across books & pages
+  const actualComposite =
+    (booksCompleted / goal.targetBooks +
+      pagesRead / goal.targetPages +
+      hoursRead / goal.targetHours) /
+    3;
+  const paceDeltaBooks = Math.round((booksCompleted - expectedBooksByNow) * 10) / 10;
+
+  let paceStatus: YearlyPaceStatus = 'on_track';
+  if (elapsedRatio === 0) {
+    paceStatus = 'on_track';
+  } else if (actualComposite >= elapsedRatio + 0.06) {
+    paceStatus = 'ahead';
+  } else if (actualComposite < elapsedRatio - 0.1) {
+    paceStatus = 'behind';
+  }
+
+  const projectionDivisor = elapsedRatio > 0.02 ? elapsedRatio : 1;
+  const projectedBooksYearEnd =
+    year < now.getFullYear()
+      ? booksCompleted
+      : Math.round(booksCompleted / projectionDivisor);
+  const projectedPagesYearEnd =
+    year < now.getFullYear() ? pagesRead : Math.round(pagesRead / projectionDivisor);
+  const projectedHoursYearEnd =
+    year < now.getFullYear()
+      ? hoursRead
+      : Math.round((hoursRead / projectionDivisor) * 10) / 10;
+
+  const categoryBreakdown: YearlyCategoryStat[] = Array.from(categoryMap.entries())
+    .map(([category, v]) => ({
+      category,
+      minutes: Math.round(v.minutes),
+      hours: Math.round((v.minutes / 60) * 10) / 10,
+      pages: Math.round(v.pages),
+      booksCount: v.books.size,
+    }))
+    .sort((a, b) => b.pages - a.pages || b.minutes - a.minutes || b.booksCount - a.booksCount);
+
+  return {
+    year,
+    goal,
+    booksCompleted,
+    pagesRead,
+    minutesRead,
+    hoursRead,
+    sessionsCount: totalSessionsCount,
+    activeDays: activeYearDayKeys.size,
+    booksPct,
+    pagesPct,
+    hoursPct,
+    yearElapsedPct,
+    expectedBooksByNow,
+    expectedPagesByNow,
+    expectedHoursByNow,
+    paceStatus,
+    paceDeltaBooks,
+    projectedBooksYearEnd,
+    projectedPagesYearEnd,
+    projectedHoursYearEnd,
+    daysRemainingInYear,
+    monthlyTargetPages: Math.round(goal.targetPages / 12),
+    monthlyTargetHours: Math.round((goal.targetHours / 12) * 10) / 10,
+    monthlyTargetBooks: Math.round((goal.targetBooks / 12) * 10) / 10,
+    bestMonthLabel,
+    bestMonthPages,
+    monthlyTrend,
+    categoryBreakdown,
   };
 }
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FolderPlus, Search, SlidersHorizontal, X } from 'lucide-react';
 import type {
   CatalogData,
@@ -54,6 +54,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   const [sortBy, setSortBy] = useState<BookSortOption>('popular');
   const [showNewListForm, setShowNewListForm] = useState(false);
   const [newListName, setNewListName] = useState('');
+
+  useEffect(() => {
+    setSelectedCategory(initialCategory);
+  }, [initialCategory]);
+
+  useEffect(() => {
+    setScope(initialScope);
+  }, [initialScope]);
 
   const downloadedIds = useMemo(
     () =>

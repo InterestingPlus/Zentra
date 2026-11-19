@@ -272,32 +272,54 @@ export async function generateBookPdfBytes(book: Book, author?: Author): Promise
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
+export function getGoogleDriveFileIdForBook(book: Book): string | undefined {
+  return book.pdfFileId || extractGoogleDriveFileId(book.pdfUrl) || extractGoogleDriveFileId(book.pdfReaderUrl);
+}
+
+export function isGoogleDrivePdf(book: Book): boolean {
+  return Boolean(getGoogleDriveFileIdForBook(book));
+}
+
+export function getDrivePreviewUrl(book: Book): string | null {
+  if (book.pdfReaderUrl && /^https:\/\/drive\.google\.com\/file\/d\/[^/]+\/preview/i.test(book.pdfReaderUrl)) {
+    return book.pdfReaderUrl;
+  }
+  const fileId = getGoogleDriveFileIdForBook(book);
+  return fileId ? `https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview` : null;
+}
+
+export function getDriveDownloadUrl(book: Book): string | null {
+  const fileId = getGoogleDriveFileIdForBook(book);
+  return fileId ? `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}` : null;
+}
+
+export async function importLocalPdfFile(file: File): Promise<ArrayBuffer> {
+  const buffer = await file.arrayBuffer();
+  if (!verifyPdfMagicHeader(buffer)) {
+    throw new Error('Selected file is not a valid PDF document (%PDF- header missing).');
+  }
+  return buffer;
+}
+
 export async function fetchOrSynthesizePdf(
   book: Book,
   author: Author | undefined,
   options?: {
     signal?: AbortSignal;
     onProgress?: (percent: number, loadedBytes: number, totalBytes: number) => void;
+    forceStudyEdition?: boolean;
   }
 ): Promise<ArrayBuffer> {
-  const driveFileId = book.pdfFileId || extractGoogleDriveFileId(book.pdfUrl);
-  const fetchUrl = driveFileId
-    ? `/api/pdf-proxy?fileId=${encodeURIComponent(driveFileId)}`
-    : /^https?:\/\//i.test(book.pdfUrl)
+  const isDrive = isGoogleDrivePdf(book);
+  const directFetchUrl =
+    !options?.forceStudyEdition && !isDrive && /^https?:\/\//i.test(book.pdfUrl)
       ? book.pdfUrl
       : '';
 
-  if (fetchUrl) {
-    const response = await fetch(fetchUrl, { signal: options?.signal });
+  if (directFetchUrl) {
+    const response = await fetch(directFetchUrl, { signal: options?.signal });
     if (!response.ok) {
-      let detail = `HTTP ${response.status}`;
-      try {
-        const errJson = (await response.json()) as { error?: string };
-        if (errJson?.error) detail = errJson.error;
-      } catch {
-        // Ignore non-JSON error body
-      }
-      throw new Error(`Failed to load PDF (${detail})`);
+      throw new Error(`Failed to load PDF (HTTP ${response.status})`);
     }
 
     const contentLength = Number(response.headers.get('content-length') ?? 0);
@@ -339,18 +361,18 @@ export async function fetchOrSynthesizePdf(
     return merged.buffer;
   }
 
-  // Built-in Zentra catalog edition: generate real valid multi-page PDF with progress steps
+  // Client-side Study Edition PDF (works 100% offline with zero backend server)
   options?.onProgress?.(20, 0, 100);
   if (options?.signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
-  await new Promise((r) => setTimeout(r, 140));
+  await new Promise((r) => setTimeout(r, 120));
   options?.onProgress?.(55, 55, 100);
   const buffer = await generateBookPdfBytes(book, author);
   if (options?.signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
-  await new Promise((r) => setTimeout(r, 120));
+  await new Promise((r) => setTimeout(r, 100));
   options?.onProgress?.(100, buffer.byteLength, buffer.byteLength);
   return buffer;
 }

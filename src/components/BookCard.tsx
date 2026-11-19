@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { CheckCircle2, Download, Heart } from 'lucide-react';
 import type { Book, DownloadRecord, ReadingProgress } from '../types/zentra';
 import { BookCover } from './BookCover';
@@ -9,8 +10,8 @@ interface BookCardProps {
   progress?: ReadingProgress;
   downloadRecord?: DownloadRecord;
   isFavorite: boolean;
-  onOpenBook: (bookId: string) => void;
-  onOpenAuthor: (authorId: string) => void;
+  onOpenBook?: (bookId: string) => void;
+  onOpenAuthor?: (authorId: string) => void;
   compact?: boolean;
 }
 
@@ -31,6 +32,8 @@ export const BookCard: React.FC<BookCardProps> = ({
       : 0;
 
   const isDownloaded = downloadRecord?.status === 'downloaded';
+  const bookPath = `/book/${encodeURIComponent(book.id)}`;
+  const authorPath = `/author/${encodeURIComponent(book.authorId)}`;
 
   return (
     <article
@@ -38,11 +41,10 @@ export const BookCard: React.FC<BookCardProps> = ({
         compact ? 'w-36 sm:w-40 shrink-0' : 'w-full'
       }`}
     >
-      <button
-        type="button"
-        onClick={() => onOpenBook(book.id)}
+      <Link
+        to={bookPath}
         aria-label={`Open ${book.title} by ${authorName}`}
-        className="relative text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-xl transition-transform duration-200 group-hover:-translate-y-0.5"
+        className="relative block text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-xl transition-transform duration-200 group-hover:-translate-y-0.5"
       >
         <BookCover
           book={book}
@@ -62,24 +64,22 @@ export const BookCard: React.FC<BookCardProps> = ({
             )}
           </div>
         )}
-      </button>
+      </Link>
 
       <div className="mt-2.5 flex flex-col gap-0.5 min-w-0">
-        <button
-          type="button"
-          onClick={() => onOpenBook(book.id)}
+        <Link
+          to={bookPath}
           className="text-left font-display font-semibold text-sm sm:text-[15px] text-slate-900 dark:text-slate-100 line-clamp-2 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
         >
           {book.title}
-        </button>
+        </Link>
 
-        <button
-          type="button"
-          onClick={() => onOpenAuthor(book.authorId)}
+        <Link
+          to={authorPath}
           className="text-left text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 truncate w-fit max-w-full py-0.5"
         >
           {authorName}
-        </button>
+        </Link>
 
         <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
           {book.language && book.language !== 'English' && (

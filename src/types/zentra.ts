@@ -90,6 +90,7 @@ export interface ReadingProgress {
   totalPages: number;
   status: ReadingStatus;
   lastReadAt: number;
+  completedAt?: number;
   totalSecondsRead: number;
   lastScrollOffset?: number;
 }
@@ -159,6 +160,13 @@ export interface DownloadRecord {
   error?: string;
 }
 
+export interface YearlyReadingGoal {
+  year: number;
+  targetBooks: number;
+  targetPages: number;
+  targetHours: number;
+}
+
 export interface GoalAndReminderSettings {
   dailyGoalMinutes: number;
   preferredDays: number[]; // 0 (Sun) .. 6 (Sat)
@@ -174,6 +182,7 @@ export interface GoalAndReminderSettings {
   paused: boolean;
   vacationMode: boolean;
   skipTodayDate?: string; // YYYY-MM-DD
+  yearlyGoals?: Record<string, YearlyReadingGoal>;
 }
 
 export interface ReaderPreferences {

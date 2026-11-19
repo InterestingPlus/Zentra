@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Columns2,
+  Download,
   Edit3,
   Eye,
   EyeOff,
@@ -20,13 +21,18 @@ import {
   Search,
   Sliders,
   Sun,
+  Upload,
   WifiOff,
   X,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
 import { getDownloadedPdfBuffer } from '../services/offlineStorage';
-import { fetchOrSynthesizePdf } from '../services/pdfService';
+import {
+  fetchOrSynthesizePdf,
+  getDriveDownloadUrl,
+  getDrivePreviewUrl,
+} from '../services/pdfService';
 import type {
   Author,
   Book,
@@ -81,6 +87,7 @@ interface PdfReaderViewProps {
   onDeleteHighlight: (id: string) => void;
   onDeleteBookmark: (id: string) => void;
   onDeleteNote: (id: string) => void;
+  onImportOfflinePdf?: (bookId: string, file: File) => Promise<void>;
 }
 
 export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
@@ -103,9 +110,14 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
   onDeleteHighlight,
   onDeleteBookmark,
   onDeleteNote,
+  onImportOfflinePdf,
 }) => {
   const readerRootRef = useRef<HTMLDivElement>(null);
+  const localPdfInputRef = useRef<HTMLInputElement>(null);
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
+  const [readerEngine, setReaderEngine] = useState<'drive_embed' | 'pdfjs'>('pdfjs');
+  const [preferStudyEdition, setPreferStudyEdition] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
   const [loadingPdf, setLoadingPdf] = useState(true);
   const [loadError, setLoadError] = useState<'offline_unavailable' | string | null>(null);
   const [totalPages, setTotalPages] = useState<number>(book.pageCount ?? 10);
@@ -120,6 +132,9 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
   const [viewportWidth, setViewportWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1024
   );
+
+  const drivePreviewUrl = getDrivePreviewUrl(book);
+  const driveDownloadUrl = getDriveDownloadUrl(book);
 
   // Panels & popovers
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
@@ -165,7 +180,7 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Load PDF (Offline IndexedDB first, otherwise online URL/synthesis if online)
+  // Load PDF (Offline IndexedDB -> Embedded Google Drive Reader if online -> Direct/Study PDF.js)
   useEffect(() => {
     let cancelled = false;
     let loadingTask: pdfjsLib.PDFDocumentLoadingTask | null = null;
@@ -174,8 +189,30 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
     async function load() {
       setLoadingPdf(true);
       setLoadError(null);
+      setPdfDoc(null);
       try {
         let buffer = await getDownloadedPdfBuffer(book.id);
+
+        if (!buffer && drivePreviewUrl && !preferStudyEdition) {
+          if (!isOnline && !isDownloaded) {
+            if (!cancelled) {
+              setLoadError('offline_unavailable');
+              setLoadingPdf(false);
+            }
+            return;
+          }
+          if (!cancelled) {
+            setReaderEngine('drive_embed');
+            const fallbackPages = book.pageCount ?? 10;
+            setTotalPages(fallbackPages);
+            const start = Math.max(1, Math.min(initialPage, fallbackPages));
+            setCurrentPage(start);
+            onSaveProgress(book.id, start, fallbackPages);
+            setLoadingPdf(false);
+          }
+          return;
+        }
+
         if (!buffer) {
           if (!isOnline && !isDownloaded) {
             if (!cancelled) {
@@ -184,10 +221,13 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
             }
             return;
           }
-          buffer = await fetchOrSynthesizePdf(book, author);
+          buffer = await fetchOrSynthesizePdf(book, author, {
+            forceStudyEdition: preferStudyEdition,
+          });
         }
 
         if (cancelled) return;
+        setReaderEngine('pdfjs');
         loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
         loadedDoc = await loadingTask.promise;
         if (cancelled) {
@@ -216,7 +256,7 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
       loadedDoc?.cleanup?.();
       loadingTask?.destroy().catch(() => {});
     };
-  }, [book.id, isOnline, isDownloaded]);
+  }, [book.id, isOnline, isDownloaded, drivePreviewUrl, preferStudyEdition]);
 
   // WakeLock while reading if enabled
   useEffect(() => {
@@ -481,13 +521,35 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
     }
   };
 
+  const handleAttachLocalPdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !onImportOfflinePdf) return;
+    setImportError(null);
+    try {
+      await onImportOfflinePdf(book.id, file);
+      setPreferStudyEdition(false);
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Could not import PDF file.');
+    } finally {
+      e.target.value = '';
+    }
+  };
+
   return (
     <div
       ref={readerRootRef}
       onMouseMove={markUserActivity}
       onKeyDown={markUserActivity}
-      className={`fixed inset-0 z-50 flex flex-col ${surfaceBgClass} transition-colors`}
+      className={`min-h-screen h-dvh flex flex-col ${surfaceBgClass} transition-colors`}
     >
+      <input
+        ref={localPdfInputRef}
+        type="file"
+        accept="application/pdf,.pdf"
+        onChange={handleAttachLocalPdf}
+        className="hidden"
+      />
+
       {/* Brightness dimmer overlay */}
       {preferences.brightnessPercent < 100 && (
         <div
@@ -517,20 +579,62 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
               </h1>
               <p className="text-[11px] opacity-70 truncate">
                 {author?.name ?? book.authorName} ·{' '}
-                {isDownloaded ? 'Offline Copy' : 'Online Stream'}
+                {isDownloaded
+                  ? 'Offline Copy'
+                  : readerEngine === 'drive_embed'
+                    ? 'Google Drive Reader'
+                    : 'Study Edition'}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
-            <button
-              type="button"
-              onClick={() => setShowSearchBar((v) => !v)}
-              aria-label="Search within PDF text"
-              className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/10"
-            >
-              <Search className="w-4 h-4" />
-            </button>
+            {drivePreviewUrl && !isDownloaded && (
+              <button
+                type="button"
+                onClick={() => setPreferStudyEdition((v) => !v)}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-current/15 text-xs font-medium hover:bg-black/5 dark:hover:bg-white/10 min-h-[36px] whitespace-nowrap"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                {preferStudyEdition ? 'Full Drive PDF' : 'Study Notes PDF'}
+              </button>
+            )}
+
+            {driveDownloadUrl && !isDownloaded && (
+              <a
+                href={driveDownloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Download original PDF from Google Drive"
+                title="Download original PDF"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                <Download className="w-4 h-4" />
+              </a>
+            )}
+
+            {onImportOfflinePdf && !isDownloaded && (
+              <button
+                type="button"
+                onClick={() => localPdfInputRef.current?.click()}
+                aria-label="Import local PDF file for offline reading"
+                title="Attach downloaded PDF for offline reading"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                <Upload className="w-4 h-4" />
+              </button>
+            )}
+
+            {readerEngine === 'pdfjs' && (
+              <button
+                type="button"
+                onClick={() => setShowSearchBar((v) => !v)}
+                aria-label="Search within PDF text"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            )}
 
             <button
               type="button"
@@ -566,14 +670,16 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
               <List className="w-4 h-4" />
             </button>
 
-            <button
-              type="button"
-              onClick={() => setShowSettingsSheet((v) => !v)}
-              aria-label="Reader appearance and layout settings"
-              className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/10"
-            >
-              <Sliders className="w-4 h-4" />
-            </button>
+            {readerEngine === 'pdfjs' && (
+              <button
+                type="button"
+                onClick={() => setShowSettingsSheet((v) => !v)}
+                aria-label="Reader appearance and layout settings"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                <Sliders className="w-4 h-4" />
+              </button>
+            )}
 
             <button
               type="button"
@@ -594,6 +700,20 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
             </button>
           </div>
         </header>
+      )}
+
+      {importError && (
+        <div className="px-4 py-2 bg-rose-50 dark:bg-rose-950/60 border-b border-rose-200 dark:border-rose-900 text-xs text-rose-700 dark:text-rose-200 flex items-center justify-between">
+          <span>{importError}</span>
+          <button
+            type="button"
+            onClick={() => setImportError(null)}
+            aria-label="Dismiss import error"
+            className="p-1"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
       )}
 
       {/* Show Controls floating trigger when hidden */}
@@ -667,7 +787,11 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
 
       {/* Main PDF Reading Surface */}
       <div
-        className="flex-1 overflow-auto relative flex justify-center items-start p-4 sm:p-8"
+        className={`flex-1 relative flex justify-center ${
+          readerEngine === 'drive_embed' && !loadingPdf && !loadError
+            ? 'overflow-hidden p-0'
+            : 'overflow-auto items-start p-4 sm:p-8'
+        }`}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -683,16 +807,27 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
               Book Unavailable Offline
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              You are currently offline and “{book.title}” has not been downloaded to Zentra’s
-              offline storage yet. Reconnect to read online or download it for offline access.
+              You are currently offline and “{book.title}” has not been saved to Zentra’s
+              offline vault yet. Reconnect to read online, or attach a downloaded PDF file.
             </p>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 rounded-xl bg-blue-700 text-white text-sm font-medium min-h-[44px]"
-            >
-              Back to Book Details
-            </button>
+            <div className="flex flex-wrap justify-center gap-2.5">
+              {onImportOfflinePdf && (
+                <button
+                  type="button"
+                  onClick={() => localPdfInputRef.current?.click()}
+                  className="px-4 py-2.5 rounded-xl bg-blue-700 text-white text-sm font-medium min-h-[44px]"
+                >
+                  Attach Local PDF
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium min-h-[44px]"
+              >
+                Back to Book Details
+              </button>
+            </div>
           </div>
         ) : loadError ? (
           <div className="my-auto max-w-md p-8 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 text-center space-y-4">
@@ -706,6 +841,14 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
               Return
             </button>
           </div>
+        ) : readerEngine === 'drive_embed' && drivePreviewUrl ? (
+          <iframe
+            src={drivePreviewUrl}
+            title={`${book.title} PDF Reader`}
+            allow="autoplay; fullscreen"
+            className="w-full h-full border-0 bg-white"
+            data-testid="drive-pdf-iframe"
+          />
         ) : pdfDoc ? (
           <div className="w-full flex flex-col items-center">
             {hasSelectableTextWarning && (
@@ -909,8 +1052,8 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
         </div>
       )}
 
-      {/* Bottom Reader Progress & Navigation Bar */}
-      {controlsVisible && (
+      {/* Bottom Reader Progress & Navigation Bar (PDF.js engine only) */}
+      {controlsVisible && readerEngine === 'pdfjs' && pdfDoc && (
         <footer
           className={`px-4 sm:px-6 py-2.5 border-t backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shrink-0 z-30 ${chromeBgClass}`}
         >
