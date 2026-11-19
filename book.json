@@ -375,10 +375,10 @@
       },
 
       "pdf": {
-        "provider": "GitHub",
-        "sourceUrl": "https://github.com/InterestingPlus/Books/blob/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
-        "readerUrl": "https://github.com/InterestingPlus/Books/raw/refs/heads/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
-        "downloadUrl": "https://github.com/InterestingPlus/Books/raw/refs/heads/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
+        "provider": "Netlify",
+        "sourceUrl": "https://books-zentra.netlify.app/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
+        "readerUrl": "https://books-zentra.netlify.app/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
+        "downloadUrl": "https://books-zentra.netlify.app/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
         "accessStatus": "public",
         "requiresPublicLinkAccess": false
       },
