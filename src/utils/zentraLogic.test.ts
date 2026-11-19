@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildGitHubJsDelivrFallbackUrl,
   computeRecommendations,
   extractGoogleDriveFileId,
   filterAndSortBooks,
   getAuthorName,
+  normalizeGitHubRawUrl,
   validateAndNormalizeCatalog,
 } from './catalogLogic';
 import {
@@ -549,3 +551,64 @@ test('computeYearlyDashboardData aggregates monthly trends, cumulative pace, pro
   assert.equal(dashboard.categoryBreakdown.length, 2);
   assert.equal(dashboard.categoryBreakdown[0].category, 'Productivity');
 });
+
+test('normalizeGitHubRawUrl converts github.com raw/blob redirects to CORS-safe raw.githubusercontent.com URLs', () => {
+  const githubRawRefs =
+    'https://github.com/InterestingPlus/Books/raw/refs/heads/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf';
+  const expectedRawRefs =
+    'https://raw.githubusercontent.com/InterestingPlus/Books/refs/heads/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf';
+  assert.equal(normalizeGitHubRawUrl(githubRawRefs), expectedRawRefs);
+
+  const githubBlob =
+    'https://github.com/InterestingPlus/Books/blob/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf?raw=true';
+  assert.equal(
+    normalizeGitHubRawUrl(githubBlob),
+    'https://raw.githubusercontent.com/InterestingPlus/Books/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf'
+  );
+
+  // Already direct raw.githubusercontent.com stays intact
+  assert.equal(normalizeGitHubRawUrl(expectedRawRefs), expectedRawRefs);
+
+  // Non-GitHub URLs stay untouched
+  const nonGithub = 'https://example.com/books/sample.pdf';
+  assert.equal(normalizeGitHubRawUrl(nonGithub), nonGithub);
+
+  // jsDelivr CDN fallback resolves cleanly for both refs/heads and branch paths
+  assert.equal(
+    buildGitHubJsDelivrFallbackUrl(githubRawRefs),
+    'https://cdn.jsdelivr.net/gh/InterestingPlus/Books@main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf'
+  );
+  assert.equal(
+    buildGitHubJsDelivrFallbackUrl(githubBlob),
+    'https://cdn.jsdelivr.net/gh/InterestingPlus/Books@main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf'
+  );
+  assert.equal(buildGitHubJsDelivrFallbackUrl(nonGithub), null);
+
+  // Catalog validation converts GitHub pdf objects so Zentra uses the custom PDF.js reader directly
+  const catalog = validateAndNormalizeCatalog({
+    books: [
+      {
+        id: 'who-moved-my-cheese',
+        title: 'Who Moved My Cheese?',
+        author: 'Spencer Johnson',
+        category: 'Self-Help & Personal Development',
+        language: 'English',
+        pdf: {
+          provider: 'GitHub',
+          sourceUrl:
+            'https://github.com/InterestingPlus/Books/blob/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf',
+          readerUrl: githubRawRefs,
+          downloadUrl: githubRawRefs,
+          accessStatus: 'public',
+          requiresPublicLinkAccess: false,
+        },
+      },
+    ],
+  });
+  const book = catalog.books[0];
+  assert.equal(book.pdfUrl, expectedRawRefs);
+  assert.equal(book.pdfReaderUrl, expectedRawRefs);
+  assert.equal(isGoogleDrivePdf(book), false);
+  assert.equal(getDrivePreviewUrl(book), null);
+});
+

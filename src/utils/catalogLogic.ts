@@ -73,6 +73,55 @@ function resolveCatalogRelativeUrl(rawUrl: string, baseCatalogUrl?: string): str
   }
 }
 
+/**
+ * Converts GitHub web/raw redirect URLs (`github.com/{owner}/{repo}/raw/...` or `/blob/...`)
+ * into direct CORS-enabled `raw.githubusercontent.com` URLs to avoid HTTP 302 CORS failures
+ * when fetching PDFs statically in the browser.
+ */
+export function normalizeGitHubRawUrl(rawUrl: string): string {
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return '';
+
+  if (/^http:\/\/raw\.githubusercontent\.com\//i.test(trimmed)) {
+    return trimmed.replace(/^http:\/\//i, 'https://');
+  }
+
+  const match = trimmed.match(
+    /^https?:\/\/(?:www\.)?github\.com\/([^/?#]+)\/([^/?#]+)\/(?:raw|blob)\/([^?#]+)(?:[?#].*)?$/i
+  );
+  if (match) {
+    const [, owner, repo, restPath] = match;
+    return `https://raw.githubusercontent.com/${owner}/${repo}/${restPath}`;
+  }
+
+  return trimmed;
+}
+
+/**
+ * Builds an optional jsDelivr CDN fallback URL for a GitHub raw file URL
+ * in case raw.githubusercontent.com is blocked on a user's network.
+ */
+export function buildGitHubJsDelivrFallbackUrl(rawUrl: string): string | null {
+  const normalized = normalizeGitHubRawUrl(rawUrl);
+  const refsMatch = normalized.match(
+    /^https:\/\/raw\.githubusercontent\.com\/([^/?#]+)\/([^/?#]+)\/refs\/(?:heads|tags)\/([^/?#]+)\/(.+)$/i
+  );
+  if (refsMatch) {
+    const [, owner, repo, ref, filePath] = refsMatch;
+    return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${ref}/${filePath}`;
+  }
+
+  const directMatch = normalized.match(
+    /^https:\/\/raw\.githubusercontent\.com\/([^/?#]+)\/([^/?#]+)\/([^/?#]+)\/(.+)$/i
+  );
+  if (directMatch) {
+    const [, owner, repo, ref, filePath] = directMatch;
+    return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${ref}/${filePath}`;
+  }
+
+  return null;
+}
+
 export function extractGoogleDriveFileId(urlOrId?: string | null): string | undefined {
   if (!urlOrId || typeof urlOrId !== 'string') return undefined;
   const trimmed = urlOrId.trim();
@@ -274,7 +323,14 @@ export function validateAndNormalizeCatalog(
         pdfReaderUrl = pdfObj.readerUrl.trim();
       }
     }
-    const resolvedPdfUrl = resolveCatalogRelativeUrl(rawPdf, baseCatalogUrl);
+    const resolvedPdfUrl = normalizeGitHubRawUrl(
+      resolveCatalogRelativeUrl(rawPdf, baseCatalogUrl)
+    );
+    if (pdfReaderUrl) {
+      pdfReaderUrl = normalizeGitHubRawUrl(
+        resolveCatalogRelativeUrl(pdfReaderUrl, baseCatalogUrl)
+      );
+    }
     if (!pdfFileId) {
       pdfFileId = extractGoogleDriveFileId(resolvedPdfUrl);
     }

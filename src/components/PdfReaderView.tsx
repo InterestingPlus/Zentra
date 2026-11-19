@@ -256,7 +256,7 @@ export const PdfReaderView: React.FC<PdfReaderViewProps> = ({
       loadedDoc?.cleanup?.();
       loadingTask?.destroy().catch(() => {});
     };
-  }, [book.id, isOnline, isDownloaded, drivePreviewUrl, preferStudyEdition]);
+  }, [book.id, book.pdfUrl, isOnline, isDownloaded, drivePreviewUrl, preferStudyEdition]);
 
   // WakeLock while reading if enabled
   useEffect(() => {

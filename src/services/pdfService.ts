@@ -1,6 +1,10 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import type { Author, Book } from '../types/zentra';
-import { extractGoogleDriveFileId } from '../utils/catalogLogic';
+import {
+  buildGitHubJsDelivrFallbackUrl,
+  extractGoogleDriveFileId,
+  normalizeGitHubRawUrl,
+} from '../utils/catalogLogic';
 
 function sanitizeWinAnsi(input: string): string {
   return input
@@ -301,6 +305,57 @@ export async function importLocalPdfFile(file: File): Promise<ArrayBuffer> {
   return buffer;
 }
 
+async function fetchPdfBufferFromUrl(
+  url: string,
+  options?: {
+    signal?: AbortSignal;
+    onProgress?: (percent: number, loadedBytes: number, totalBytes: number) => void;
+  }
+): Promise<ArrayBuffer> {
+  const response = await fetch(url, { signal: options?.signal });
+  if (!response.ok) {
+    throw new Error(`Failed to load PDF (HTTP ${response.status})`);
+  }
+
+  const contentLength = Number(response.headers.get('content-length') ?? 0);
+  if (!response.body) {
+    const buf = await response.arrayBuffer();
+    if (!verifyPdfMagicHeader(buf)) {
+      throw new Error('Remote response did not return a valid PDF document.');
+    }
+    options?.onProgress?.(100, buf.byteLength, buf.byteLength);
+    return buf;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) {
+      chunks.push(value);
+      received += value.length;
+      const total = contentLength > 0 ? contentLength : Math.max(received * 1.15, 1024);
+      const pct = Math.min(98, Math.round((received / total) * 100));
+      options?.onProgress?.(pct, received, contentLength || received);
+    }
+  }
+
+  const merged = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.length;
+  }
+  if (!verifyPdfMagicHeader(merged.buffer)) {
+    throw new Error('Downloaded file did not contain a valid PDF header.');
+  }
+  options?.onProgress?.(100, received, received);
+  return merged.buffer;
+}
+
 export async function fetchOrSynthesizePdf(
   book: Book,
   author: Author | undefined,
@@ -311,54 +366,33 @@ export async function fetchOrSynthesizePdf(
   }
 ): Promise<ArrayBuffer> {
   const isDrive = isGoogleDrivePdf(book);
-  const directFetchUrl =
+  const rawCandidate =
     !options?.forceStudyEdition && !isDrive && /^https?:\/\//i.test(book.pdfUrl)
       ? book.pdfUrl
       : '';
+  const directFetchUrl = rawCandidate ? normalizeGitHubRawUrl(rawCandidate) : '';
 
   if (directFetchUrl) {
-    const response = await fetch(directFetchUrl, { signal: options?.signal });
-    if (!response.ok) {
-      throw new Error(`Failed to load PDF (HTTP ${response.status})`);
+    const candidateUrls = [directFetchUrl];
+    const jsDelivrFallback = buildGitHubJsDelivrFallbackUrl(directFetchUrl);
+    if (jsDelivrFallback && jsDelivrFallback !== directFetchUrl) {
+      candidateUrls.push(jsDelivrFallback);
     }
 
-    const contentLength = Number(response.headers.get('content-length') ?? 0);
-    if (!response.body) {
-      const buf = await response.arrayBuffer();
-      if (!verifyPdfMagicHeader(buf)) {
-        throw new Error('Remote response did not return a valid PDF document.');
-      }
-      options?.onProgress?.(100, buf.byteLength, buf.byteLength);
-      return buf;
-    }
-
-    const reader = response.body.getReader();
-    const chunks: Uint8Array[] = [];
-    let received = 0;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (value) {
-        chunks.push(value);
-        received += value.length;
-        const total = contentLength > 0 ? contentLength : Math.max(received * 1.15, 1024);
-        const pct = Math.min(98, Math.round((received / total) * 100));
-        options?.onProgress?.(pct, received, contentLength || received);
+    let lastError: unknown;
+    for (const candidateUrl of candidateUrls) {
+      try {
+        return await fetchPdfBufferFromUrl(candidateUrl, options);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          throw err;
+        }
+        lastError = err;
       }
     }
-
-    const merged = new Uint8Array(received);
-    let offset = 0;
-    for (const chunk of chunks) {
-      merged.set(chunk, offset);
-      offset += chunk.length;
-    }
-    if (!verifyPdfMagicHeader(merged.buffer)) {
-      throw new Error('Downloaded file did not contain a valid PDF header.');
-    }
-    options?.onProgress?.(100, received, received);
-    return merged.buffer;
+    throw lastError instanceof Error
+      ? lastError
+      : new Error('Unable to fetch remote PDF document.');
   }
 
   // Client-side Study Edition PDF (works 100% offline with zero backend server)
