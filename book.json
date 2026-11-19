@@ -261,16 +261,16 @@
         "status": "candidate",
         "editionMatchConfirmed": false
       },
+
       "pdf": {
-        "provider": "Google Drive",
-        "fileId": "1YLL5Ax0DJsd-laOQ0j38Hv2uIKkZiFET",
-        "sourceUrl": "https://drive.google.com/file/d/1YLL5Ax0DJsd-laOQ0j38Hv2uIKkZiFET/view?usp=sharing",
-        "readerUrl": "https://drive.google.com/file/d/1YLL5Ax0DJsd-laOQ0j38Hv2uIKkZiFET/preview",
-        "downloadUrl": "https://drive.google.com/uc?export=download&id=1YLL5Ax0DJsd-laOQ0j38Hv2uIKkZiFET",
-        "accessStatus": "not_verified",
-        "requiresPublicLinkAccess": true,
-        "notes": "Test sharing permissions, redirects, MIME type and byte-range support before production streaming. Google Drive may show confirmation pages or rate limits for some files."
+        "provider": "Netlify",
+        "sourceUrl": "https://books-zentra.netlify.app/Philosophy%20%26%20Motivation/chanakya-niti.pdf",
+        "readerUrl": "https://books-zentra.netlify.app/Philosophy%20%26%20Motivation/chanakya-niti.pdf",
+        "downloadUrl": "https://books-zentra.netlify.app/Philosophy%20%26%20Motivation/chanakya-niti.pdf",
+        "accessStatus": "public",
+        "requiresPublicLinkAccess": false
       },
+
       "description": "A collection of practical aphorisms traditionally attributed to Chanakya, covering judgment, relationships, learning, wealth, conduct and the challenges of everyday life. The precise contents and translation vary by edition.",
       "summary": {
         "short": "A collection of practical aphorisms traditionally attributed to Chanakya, covering judgment, relationships, learning, wealth, conduct and the challenges of everyday life. The precise contents and translation vary by edition.",
