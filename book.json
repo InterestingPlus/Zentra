@@ -4,10 +4,7 @@
   "catalogName": "Zentra Books",
   "lastUpdated": "2026-11-18",
   "defaultLanguage": "en",
-  "supportedLanguages": [
-    "English",
-    "Hindi"
-  ],
+  "supportedLanguages": ["English", "Hindi"],
   "authors": [
     {
       "id": "author_chanakya",
@@ -233,27 +230,19 @@
       "id": "productivity-business",
       "name": "Productivity & Business",
       "description": "Work, leadership, entrepreneurship and practical productivity.",
-      "bookIds": [
-        "time-management",
-        "the-hard-thing-about-hard-things"
-      ]
+      "bookIds": ["time-management", "the-hard-thing-about-hard-things"]
     },
     {
       "id": "finance-wealth",
       "name": "Finance & Wealth",
       "description": "Saving, money management, wealth creation and financial thinking.",
-      "bookIds": [
-        "the-richest-man-in-babylon-hi",
-        "the-millionaire-fastlane"
-      ]
+      "bookIds": ["the-richest-man-in-babylon-hi", "the-millionaire-fastlane"]
     },
     {
       "id": "health-yoga-spirituality",
       "name": "Health, Yoga & Spirituality",
       "description": "Traditional yoga, breathwork and contemplative practices.",
-      "bookIds": [
-        "the-science-of-breath"
-      ]
+      "bookIds": ["the-science-of-breath"]
     }
   ],
   "books": [
@@ -261,9 +250,7 @@
       "id": "chanakya-niti",
       "title": "Chanakya Niti",
       "subtitle": null,
-      "authorIds": [
-        "author_chanakya"
-      ],
+      "authorIds": ["author_chanakya"],
       "primaryAuthorId": "author_chanakya",
       "categoryId": "philosophy-motivation",
       "category": "Philosophy & Motivation",
@@ -295,12 +282,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Indian Philosophy",
-        "Wisdom",
-        "Ethics",
-        "Strategy"
-      ],
+      "tags": ["Indian Philosophy", "Wisdom", "Ethics", "Strategy"],
       "metadata": {
         "isbn": null,
         "pageCount": null,
@@ -326,9 +308,7 @@
       "id": "your-ultimate-guide-to-success",
       "title": "Your Ultimate Guide to Success",
       "subtitle": null,
-      "authorIds": [
-        "author_unknown_ultimate_success"
-      ],
+      "authorIds": ["author_unknown_ultimate_success"],
       "primaryAuthorId": "author_unknown_ultimate_success",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
@@ -358,10 +338,7 @@
         "chapterSummaries": [],
         "summaryStatus": "pending_identification"
       },
-      "tags": [
-        "Success",
-        "Personal Development"
-      ],
+      "tags": ["Success", "Personal Development"],
       "metadata": {
         "isbn": null,
         "pageCount": null,
@@ -384,29 +361,28 @@
       "id": "who-moved-my-cheese",
       "title": "Who Moved My Cheese?",
       "subtitle": null,
-      "authorIds": [
-        "author_spencer_johnson"
-      ],
+      "authorIds": ["author_spencer_johnson"],
       "primaryAuthorId": "author_spencer_johnson",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
       "language": "English",
+
       "cover": {
         "url": "https://books.google.com/books/content?id=3RoEPgAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
         "provider": "Google Books",
         "status": "candidate",
         "editionMatchConfirmed": false
       },
+
       "pdf": {
-        "provider": "Google Drive",
-        "fileId": "169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg",
-        "sourceUrl": "https://drive.google.com/file/d/169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg/view?usp=sharing",
-        "readerUrl": "https://drive.google.com/file/d/169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg/preview",
-        "downloadUrl": "https://drive.google.com/uc?export=download&id=169Z0SysG3PEDAAMhxXd_NLXwXwb6T9Hg",
-        "accessStatus": "not_verified",
-        "requiresPublicLinkAccess": true,
-        "notes": "Test sharing permissions, redirects, MIME type and byte-range support before production streaming. Google Drive may show confirmation pages or rate limits for some files."
+        "provider": "GitHub",
+        "sourceUrl": "https://github.com/InterestingPlus/Books/blob/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
+        "readerUrl": "https://github.com/InterestingPlus/Books/raw/refs/heads/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
+        "downloadUrl": "https://github.com/InterestingPlus/Books/raw/refs/heads/main/Self-Help%20%26%20Personal%20Development/who-moved-my-cheese.pdf",
+        "accessStatus": "public",
+        "requiresPublicLinkAccess": false
       },
+
       "description": "A business parable about four characters navigating change after the cheese they depend on disappears. It explores how assumptions, fear and attachment to familiar routines can prevent people from adapting, and encourages noticing change early and responding constructively.",
       "summary": {
         "short": "A business parable about four characters navigating change after the cheese they depend on disappears. It explores how assumptions, fear and attachment to familiar routines can prevent people from adapting, and encourages noticing change early and responding constructively.",
@@ -419,12 +395,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Change",
-        "Adaptability",
-        "Mindset",
-        "Work"
-      ],
+      "tags": ["Change", "Adaptability", "Mindset", "Work"],
       "metadata": {
         "isbn": "9780399144462",
         "pageCount": 96,
@@ -450,9 +421,7 @@
       "id": "what-to-say-when-you-talk-to-yourself",
       "title": "What to Say When You Talk to Yourself",
       "subtitle": null,
-      "authorIds": [
-        "author_shad_helmstetter"
-      ],
+      "authorIds": ["author_shad_helmstetter"],
       "primaryAuthorId": "author_shad_helmstetter",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
@@ -485,12 +454,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Self-Talk",
-        "Mindset",
-        "Personal Growth",
-        "Psychology"
-      ],
+      "tags": ["Self-Talk", "Mindset", "Personal Growth", "Psychology"],
       "metadata": {
         "isbn": "9780671635190",
         "pageCount": 255,
@@ -516,10 +480,7 @@
       "id": "what-every-body-is-saying",
       "title": "What Every BODY Is Saying",
       "subtitle": null,
-      "authorIds": [
-        "author_joe_navarro",
-        "author_marvin_karlins"
-      ],
+      "authorIds": ["author_joe_navarro", "author_marvin_karlins"],
       "primaryAuthorId": "author_joe_navarro",
       "categoryId": "psychology-mindset",
       "category": "Psychology & Mindset",
@@ -552,12 +513,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Body Language",
-        "Psychology",
-        "Communication",
-        "Behavior"
-      ],
+      "tags": ["Body Language", "Psychology", "Communication", "Behavior"],
       "metadata": {
         "isbn": "9780061755668",
         "pageCount": 272,
@@ -582,10 +538,7 @@
       "id": "triggers",
       "title": "Triggers",
       "subtitle": null,
-      "authorIds": [
-        "author_marshall_goldsmith",
-        "author_mark_reiter"
-      ],
+      "authorIds": ["author_marshall_goldsmith", "author_mark_reiter"],
       "primaryAuthorId": "author_marshall_goldsmith",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
@@ -618,12 +571,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Behavior Change",
-        "Self-Awareness",
-        "Leadership",
-        "Habits"
-      ],
+      "tags": ["Behavior Change", "Self-Awareness", "Leadership", "Habits"],
       "metadata": {
         "isbn": "9780804141239",
         "pageCount": 272,
@@ -649,9 +597,7 @@
       "id": "time-management",
       "title": "Time Management",
       "subtitle": null,
-      "authorIds": [
-        "author_unknown_time_management"
-      ],
+      "authorIds": ["author_unknown_time_management"],
       "primaryAuthorId": "author_unknown_time_management",
       "categoryId": "productivity-business",
       "category": "Productivity & Business",
@@ -681,10 +627,7 @@
         "chapterSummaries": [],
         "summaryStatus": "pending_identification"
       },
-      "tags": [
-        "Time Management",
-        "Productivity"
-      ],
+      "tags": ["Time Management", "Productivity"],
       "metadata": {
         "isbn": null,
         "pageCount": null,
@@ -707,9 +650,7 @@
       "id": "think-and-grow-rich-en",
       "title": "Think and Grow Rich",
       "subtitle": null,
-      "authorIds": [
-        "author_napoleon_hill"
-      ],
+      "authorIds": ["author_napoleon_hill"],
       "primaryAuthorId": "author_napoleon_hill",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
@@ -744,12 +685,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Success",
-        "Wealth",
-        "Goal Setting",
-        "Personal Development"
-      ],
+      "tags": ["Success", "Wealth", "Goal Setting", "Personal Development"],
       "metadata": {
         "isbn": "9780143474456",
         "pageCount": 280,
@@ -764,9 +700,7 @@
       },
       "featured": false,
       "popular": false,
-      "relatedBookIds": [
-        "think-and-grow-rich-hi"
-      ],
+      "relatedBookIds": ["think-and-grow-rich-hi"],
       "metadataStatus": "verified",
       "metadataSources": [
         "https://www.penguin.co.in/book/think-and-grow-rich-2/",
@@ -777,9 +711,7 @@
       "id": "think-straight",
       "title": "Think Straight",
       "subtitle": null,
-      "authorIds": [
-        "author_darius_foroux"
-      ],
+      "authorIds": ["author_darius_foroux"],
       "primaryAuthorId": "author_darius_foroux",
       "categoryId": "philosophy-motivation",
       "category": "Philosophy & Motivation",
@@ -813,12 +745,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Thinking",
-        "Mental Clarity",
-        "Decision Making",
-        "Productivity"
-      ],
+      "tags": ["Thinking", "Mental Clarity", "Decision Making", "Productivity"],
       "metadata": {
         "isbn": "9780143452133",
         "pageCount": 132,
@@ -844,9 +771,7 @@
       "id": "think-and-grow-rich-hi",
       "title": "Think and Grow Rich",
       "subtitle": null,
-      "authorIds": [
-        "author_napoleon_hill"
-      ],
+      "authorIds": ["author_napoleon_hill"],
       "primaryAuthorId": "author_napoleon_hill",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
@@ -880,12 +805,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Success",
-        "Wealth",
-        "Goal Setting",
-        "Personal Development"
-      ],
+      "tags": ["Success", "Wealth", "Goal Setting", "Personal Development"],
       "metadata": {
         "isbn": null,
         "pageCount": null,
@@ -900,9 +820,7 @@
       },
       "featured": false,
       "popular": false,
-      "relatedBookIds": [
-        "think-and-grow-rich-en"
-      ],
+      "relatedBookIds": ["think-and-grow-rich-en"],
       "metadataStatus": "partially_verified",
       "metadataSources": []
     },
@@ -910,9 +828,7 @@
       "id": "the-secret-hi",
       "title": "The Secret",
       "subtitle": null,
-      "authorIds": [
-        "author_rhonda_byrne"
-      ],
+      "authorIds": ["author_rhonda_byrne"],
       "primaryAuthorId": "author_rhonda_byrne",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
@@ -946,12 +862,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Law of Attraction",
-        "Mindset",
-        "Gratitude",
-        "Motivation"
-      ],
+      "tags": ["Law of Attraction", "Mindset", "Gratitude", "Motivation"],
       "metadata": {
         "isbn": null,
         "pageCount": null,
@@ -977,9 +888,7 @@
       "id": "the-science-of-breath",
       "title": "The Science of Breath",
       "subtitle": null,
-      "authorIds": [
-        "author_yogi_ramacharaka"
-      ],
+      "authorIds": ["author_yogi_ramacharaka"],
       "primaryAuthorId": "author_yogi_ramacharaka",
       "categoryId": "health-yoga-spirituality",
       "category": "Health, Yoga & Spirituality",
@@ -1012,12 +921,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Yoga",
-        "Breathwork",
-        "Indian Philosophy",
-        "Wellness"
-      ],
+      "tags": ["Yoga", "Breathwork", "Indian Philosophy", "Wellness"],
       "metadata": {
         "isbn": "9780787306915",
         "pageCount": 88,
@@ -1043,9 +947,7 @@
       "id": "the-richest-man-in-babylon-hi",
       "title": "The Richest Man in Babylon",
       "subtitle": null,
-      "authorIds": [
-        "author_george_clason"
-      ],
+      "authorIds": ["author_george_clason"],
       "primaryAuthorId": "author_george_clason",
       "categoryId": "finance-wealth",
       "category": "Finance & Wealth",
@@ -1080,12 +982,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Personal Finance",
-        "Saving",
-        "Wealth Building",
-        "Money"
-      ],
+      "tags": ["Personal Finance", "Saving", "Wealth Building", "Money"],
       "metadata": {
         "isbn": null,
         "pageCount": null,
@@ -1111,9 +1008,7 @@
       "id": "the-power-of-your-subconscious-mind",
       "title": "The Power of Your Subconscious Mind",
       "subtitle": null,
-      "authorIds": [
-        "author_joseph_murphy"
-      ],
+      "authorIds": ["author_joseph_murphy"],
       "primaryAuthorId": "author_joseph_murphy",
       "categoryId": "psychology-mindset",
       "category": "Psychology & Mindset",
@@ -1146,12 +1041,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Subconscious Mind",
-        "Beliefs",
-        "Self-Help",
-        "Mindset"
-      ],
+      "tags": ["Subconscious Mind", "Beliefs", "Self-Help", "Mindset"],
       "metadata": {
         "isbn": "9780143474449",
         "pageCount": 296,
@@ -1177,9 +1067,7 @@
       "id": "the-obstacle-is-the-way",
       "title": "The Obstacle Is the Way",
       "subtitle": null,
-      "authorIds": [
-        "author_ryan_holiday"
-      ],
+      "authorIds": ["author_ryan_holiday"],
       "primaryAuthorId": "author_ryan_holiday",
       "categoryId": "philosophy-motivation",
       "category": "Philosophy & Motivation",
@@ -1213,12 +1101,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Stoicism",
-        "Resilience",
-        "Philosophy",
-        "Problem Solving"
-      ],
+      "tags": ["Stoicism", "Resilience", "Philosophy", "Problem Solving"],
       "metadata": {
         "isbn": "9781781251485",
         "pageCount": 224,
@@ -1243,9 +1126,7 @@
       "id": "the-millionaire-fastlane",
       "title": "The Millionaire Fastlane",
       "subtitle": null,
-      "authorIds": [
-        "author_mj_demarco"
-      ],
+      "authorIds": ["author_mj_demarco"],
       "primaryAuthorId": "author_mj_demarco",
       "categoryId": "finance-wealth",
       "category": "Finance & Wealth",
@@ -1310,9 +1191,7 @@
       "id": "the-law-of-attraction",
       "title": "The Law of Attraction",
       "subtitle": null,
-      "authorIds": [
-        "author_unknown_law_of_attraction"
-      ],
+      "authorIds": ["author_unknown_law_of_attraction"],
       "primaryAuthorId": "author_unknown_law_of_attraction",
       "categoryId": "philosophy-motivation",
       "category": "Philosophy & Motivation",
@@ -1342,11 +1221,7 @@
         "chapterSummaries": [],
         "summaryStatus": "pending_identification"
       },
-      "tags": [
-        "Law of Attraction",
-        "Mindset",
-        "Motivation"
-      ],
+      "tags": ["Law of Attraction", "Mindset", "Motivation"],
       "metadata": {
         "isbn": null,
         "pageCount": null,
@@ -1369,9 +1244,7 @@
       "id": "the-hard-thing-about-hard-things",
       "title": "The Hard Thing About Hard Things",
       "subtitle": null,
-      "authorIds": [
-        "author_ben_horowitz"
-      ],
+      "authorIds": ["author_ben_horowitz"],
       "primaryAuthorId": "author_ben_horowitz",
       "categoryId": "productivity-business",
       "category": "Productivity & Business",
@@ -1430,9 +1303,7 @@
       "id": "the-art-of-seduction",
       "title": "The Art of Seduction",
       "subtitle": null,
-      "authorIds": [
-        "author_robert_greene"
-      ],
+      "authorIds": ["author_robert_greene"],
       "primaryAuthorId": "author_robert_greene",
       "categoryId": "psychology-mindset",
       "category": "Psychology & Mindset",
@@ -1466,12 +1337,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Psychology",
-        "Influence",
-        "Social Dynamics",
-        "Persuasion"
-      ],
+      "tags": ["Psychology", "Influence", "Social Dynamics", "Persuasion"],
       "metadata": {
         "isbn": "9781861977694",
         "pageCount": 496,
@@ -1497,9 +1363,7 @@
       "id": "the-magic",
       "title": "The Magic",
       "subtitle": null,
-      "authorIds": [
-        "author_rhonda_byrne"
-      ],
+      "authorIds": ["author_rhonda_byrne"],
       "primaryAuthorId": "author_rhonda_byrne",
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
@@ -1532,12 +1396,7 @@
         "chapterSummaries": [],
         "summaryStatus": "editorial_summary"
       },
-      "tags": [
-        "Gratitude",
-        "Mindset",
-        "Personal Growth",
-        "Spirituality"
-      ],
+      "tags": ["Gratitude", "Mindset", "Personal Growth", "Spirituality"],
       "metadata": {
         "isbn": "9781849838399",
         "pageCount": 272,
