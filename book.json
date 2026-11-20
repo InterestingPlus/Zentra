@@ -11,19 +11,10 @@
       "name": "Chanakya",
       "sortName": "Chanakya",
       "bio": "Traditionally identified as an ancient Indian teacher, philosopher, economist and royal adviser associated with the Mauryan period. The sayings attributed to Chanakya are collected in works commonly known as Chanakya Niti.",
-      "photoUrl": null,
+      "photoUrl": "https://books-zentra.netlify.app/authors/author_chanakya.webp",
       "profileUrl": null,
       "metadataStatus": "partially_verified",
       "notes": "Historical portrait attribution is uncertain; add an appropriately licensed image only after verification."
-    },
-    {
-      "id": "author_unknown_ultimate_success",
-      "name": "Unknown",
-      "sortName": "Unknown",
-      "bio": null,
-      "photoUrl": null,
-      "profileUrl": null,
-      "metadataStatus": "needs_review"
     },
     {
       "id": "author_spencer_johnson",
