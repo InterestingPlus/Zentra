@@ -246,11 +246,12 @@
       "categoryId": "philosophy-motivation",
       "category": "Philosophy & Motivation",
       "language": "Hindi",
+
       "cover": {
-        "url": "https://books.google.com/books/content?id=QmNqzQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-        "provider": "Google Books",
-        "status": "candidate",
-        "editionMatchConfirmed": false
+        "url": "https://books-zentra.netlify.app/Philosophy%20%26%20Motivation/chanakya-niti.webp",
+        "provider": "Netlify",
+        "status": "available",
+        "editionMatchConfirmed": true
       },
 
       "pdf": {
@@ -824,12 +825,14 @@
       "categoryId": "self-help-personal-development",
       "category": "Self-Help & Personal Development",
       "language": "Hindi",
+
       "cover": {
-        "url": null,
-        "provider": null,
-        "status": "not_found",
-        "editionMatchConfirmed": false
+        "url": "https://books-zentra.netlify.app/Philosophy%20%26%20Motivation/the-secret.webp",
+        "provider": "Netlify",
+        "status": "available",
+        "editionMatchConfirmed": true
       },
+
       "pdf": {
         "provider": "Google Drive",
         "fileId": "1_RQ7d_Wtmue0jNI-xGSJ-g77lkqa42Yg",
